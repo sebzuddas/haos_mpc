@@ -145,8 +145,10 @@ class SensorDataManager:
 
         pass
 
-    async def __error_handling(self):
-
+    async def unsubscribe(self, event):
+        """
+        A method to unsubscribe from a signular event or trigger. 
+        """
         pass
 
     async def __unsubscribe_all(self):
@@ -156,12 +158,46 @@ class SensorDataManager:
 
         pass
 
-    async def unsubscribe(self, event):
+    async def fire_event(self, event):
         """
-        A method to unsubscribe from a signular event or trigger. 
+        A method to fire events. 
         """
         pass
 
+    async def call_service(self, service):
+        """
+        A method to call a service.
+        """
+        pass
+
+    async def fetch_config(self):
+        """
+        A method to fetch the config of the HAOS instance.
+        """
+        pass
+
+    async def fetch_all_services(self):
+        """
+        A method to fetch all services currently running within HAOS.
+        """
+        pass
+
+    async def fetch_panels(self):
+        """
+        A method toget a dump of the current registered panels in HAOS.
+        """
+
+    async def ping_pong(self):
+        """ 
+        A method to check connection via a ping pong response to HAOS. 
+        """
+
+    async def __error_handling(self):
+        """
+        Method to handle errors
+        """
+
+        pass
 
     async def close(self):
         await self.connection.close()
