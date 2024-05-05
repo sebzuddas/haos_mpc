@@ -15,7 +15,7 @@ class SensorDataManager:
         self.auth_token: str = auth_token
         self.websocket_url: str = websocket_url
         self.message_id: int = 1# has to be more than zero. 
-        self.subscribed_events: dict = {}
+        self.subscribed_events: dict = {}# to retain ID's for subscribed events or triggers. 
 
     async def connect(self) -> None:
         """
@@ -125,10 +125,14 @@ class SensorDataManager:
             logging.error(f"Error during fetch_all_states: {e}")
             return {}
 
-    async def subscribe_event(self, event_name):
+    async def subscribe(self, event:str, type:str) -> bool:
         """
-        A method to subscribe to events.
+        A method to subscribe to events or triggers. 
+        Attributes:
+        event - string - the event or trigger name. 
+        type -  string - declares whether the event is a trigger or not
         """
+
 
         # states_request = json.dumps({
         #     'id': self.message_id,
@@ -144,6 +148,20 @@ class SensorDataManager:
     async def __error_handling(self):
 
         pass
+
+    async def __unsubscribe_all(self):
+        """
+        A method to unsubscribe from all events or triggers. 
+        """
+
+        pass
+
+    async def unsubscribe(self, event):
+        """
+        A method to unsubscribe from a signular event or trigger. 
+        """
+        pass
+
 
     async def close(self):
         await self.connection.close()
