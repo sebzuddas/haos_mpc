@@ -1,5 +1,8 @@
 import asyncio
 import yaml
+import pandas as pd
+
+
 from SensorDataManager import SensorDataManager
 from DatabaseManager import DatabaseManager
 from dotenv import dotenv_values
@@ -25,7 +28,7 @@ async def get_database_data():
 async def main():
 
     config = dotenv_values(".env")
-    auth = config.get("HASS_IO_AUTH_TOKEN")
+    __auth = config.get("HASS_IO___auth_TOKEN")
     url = config.get("HASS_IO_HOSTNAME")
     yaml_file = config.get("YAML_NAME")
 
@@ -44,7 +47,20 @@ async def main():
     }
 
     databasemanager = DatabaseManager(credentials=credentials_dict)# instantiate an object for the database
+    table = databasemanager.get_database_table('ltss')#this returns an sqlalchemy table object. 
     
+    sensor = databasemanager.get_sensor_timeseries("sensor.smart_plug_radiator_current_consumption")
+    
+    print(f"Table Name: {table.name}")
+    for column in table.columns:
+        print(f"Column: {column.name}, Type: {column.type}")
+
+    print(sensor)
+
+
+
+
+
     exit()
 
     timeseries_schema = config.get("TIMESERIES_SCHEMA")
@@ -52,7 +68,7 @@ async def main():
 
 
 
-    datamanager = SensorDataManager(auth_token=auth, websocket_url=url)
+    datamanager = SensorDataManager(auth_token=__auth, websocket_url=url)
     await datamanager.connect()
 
     # await init_subscriptions(datamanager, yaml_file)
