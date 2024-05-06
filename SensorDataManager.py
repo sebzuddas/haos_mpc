@@ -1,11 +1,13 @@
 """
-A class to manage the interaction between the python applicaiton and HAOS
+This class `SensorDataManager` manages authentication and data handling for Home Assistant Operating
+System (HAOS) using a WebSocket connection.
 """
 
 import asyncio
 import websockets
 import json
 import logging
+
 
 class SensorDataManager:
     def __init__(self, auth_token: str, websocket_url: str) -> None:
@@ -17,9 +19,11 @@ class SensorDataManager:
         self.message_id: int = 1# has to be more than zero. Has to increment. 
         self.subscribed_events: dict = {}# to retain ID's for subscribed events or triggers. 
 
+
     async def connect(self) -> None:
         """
-        Method to connect to the HAOS instance via a Websocket
+        The `connect` method establishes a WebSocket connection to a Home Assistant Operating System (HAOS)
+        instance and handles authentication.
         """
         self.connection = await websockets.connect(self.websocket_url)
         try:
@@ -53,7 +57,13 @@ class SensorDataManager:
 
     async def fetch_sensor_state(self, sensor_id) -> dict:
         """
-        Method to fetch specific sensor data and output the json as a dictionary
+        This async function fetches specific sensor data by sending a request, receiving a response, and
+        returning the data as a dictionary after processing.
+        
+        :param sensor_id: The `sensor_id` parameter in the `fetch_sensor_state` method is used to specify
+        the ID of the sensor for which you want to fetch the data. This ID is used to identify the specific
+        sensor whose state you are interested in retrieving
+        :return: The method `fetch_sensor_state` is returning the specific sensor data as a dictionary.
         """
         sensor_request = json.dumps(
             {"id": self.message_id, "type": "get_states"}
@@ -96,7 +106,11 @@ class SensorDataManager:
 
     async def fetch_all_states(self) -> dict:
         """
-        Method to fetch all states present in HAOS at the time the request is sent.
+        This async function fetches all states present in HAOS by sending a request, receiving a response,
+        and parsing the JSON data.
+        :return: The `fetch_all_states` method is returning a dictionary containing the states present in
+        HAOS (Home Assistant Operating System) at the time the request is sent. If there is an error during
+        the process, an empty dictionary `{}` is returned.
         """
         states_request = json.dumps({
             "id": self.message_id, 

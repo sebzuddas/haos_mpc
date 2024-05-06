@@ -1,7 +1,8 @@
 import asyncio
 import yaml
 import pandas as pd
-
+import matplotlib.pyplot as plt
+import numpy as np
 
 from SensorDataManager import SensorDataManager
 from DatabaseManager import DatabaseManager
@@ -28,7 +29,7 @@ async def get_database_data():
 async def main():
 
     config = dotenv_values(".env")
-    __auth = config.get("HASS_IO___auth_TOKEN")
+    auth = config.get("HASS_IO_AUTH_TOKEN")
     url = config.get("HASS_IO_HOSTNAME")
     yaml_file = config.get("YAML_NAME")
 
@@ -46,21 +47,50 @@ async def main():
         'db_password':db_password
     }
 
+
     databasemanager = DatabaseManager(credentials=credentials_dict)# instantiate an object for the database
     table = databasemanager.get_database_table('ltss')#this returns an sqlalchemy table object. 
     
-    sensor = databasemanager.get_sensor_timeseries("sensor.smart_plug_radiator_current_consumption")
     
-    print(f"Table Name: {table.name}")
-    for column in table.columns:
-        print(f"Column: {column.name}, Type: {column.type}")
+    # print(f"Table Name: {table.name}")
+    # for column in table.columns:
+    #     print(f"Column: {column.name}, Type: {column.type}")
 
-    print(sensor)
+### Computers
+    """
+    computers_sensor = databasemanager.get_sensor_timeseries("sensor.smart_plug_computers_current_consumption")
+
+    computers_sensor = computers_sensor[computers_sensor.state != 'unavailable']# drop unavailable
+
+    computers_sensor["state"] = np.where(computers_sensor["state"] == "unavailable", 0, computers_sensor["state"])# change unavailable to zero
+    
+    computer_sensor_state = pd.to_numeric(computers_sensor["state"], errors='coerce')
+
+    computer_sensor_state.plot()
+    """
+
+### Radiators
+        
+    radiator_sensor = databasemanager.get_sensor_timeseries("sensor.smart_plug_radiator_current_consumption")
+
+    radiator_sensor["state"] = pd.to_numeric(radiator_sensor["state"])
+    radiator_sensor["input"] = np.where(radiator_sensor["state"]!=0, 1, 0)
+
+
+
+    radiator_sensor["state"].plot()
 
 
 
 
 
+
+
+
+
+
+### show plot
+    plt.show()
     exit()
 
     timeseries_schema = config.get("TIMESERIES_SCHEMA")

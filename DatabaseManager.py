@@ -85,5 +85,32 @@ class DatabaseManager:
                 result = connection.execute(stmt)
                 data = result.fetchall()
                 df = pd.DataFrame(data, columns=result.keys())
+                df = df.drop(["entity_id"], axis=1)# drop the entity id since we've asked for it in the method call
+                df['time'] = pd.to_datetime(df['time'])# make time a datetime var
+                df.set_index('time', inplace=True)#make time the index
+
+                df = self._resample_timeseries(df)
 
             return df
+
+    def _resample_timeseries(self, df) -> pd.DataFrame:
+        """
+        This Python function resamples a time series DataFrame to a common time interval based on the most
+        common time difference between samples.
+        
+        :param df: The `resample_timeseries` function takes a DataFrame `df` as input and resamples it based
+        on the most common time interval found in the index of the DataFrame. The function calculates the
+        most common time interval between samples, rounds it to the nearest second, and then uses this
+        rounded interval to
+        :return: The function `resample_timeseries` is returning a resampled DataFrame with forward-filled
+        values based on the most common time interval found in the input DataFrame `df`.
+        """
+        
+        time_diffs = df.index.to_series().diff() # get the difference between sample times
+        rounded_interval = time_diffs.mode()[0]# find most common time interval
+        common_interval_seconds = round(rounded_interval.total_seconds()) # find the most common and round
+        rounded_sample_time = pd.Timedelta(seconds=common_interval_seconds) # make these a Timedelta object
+
+        df = df.resample(rounded_sample_time).ffill()   
+
+        return df
