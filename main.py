@@ -8,7 +8,7 @@ async def init_subscriptions(datamanager:object, subscriptions_file:str):
     """
     Reads the subscriptions file and initialises subscriptions via the datamanager object.
     """
-    
+
     with open (subscriptions_file, 'r') as file:
         subscriptions = yaml.safe_load(file)
     
@@ -17,7 +17,8 @@ async def init_subscriptions(datamanager:object, subscriptions_file:str):
     pass
 
 
-
+async def get_database_data():
+    pass
 
 
 async def main():

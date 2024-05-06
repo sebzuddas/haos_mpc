@@ -14,7 +14,7 @@ class SensorDataManager:
         """
         self.auth_token: str = auth_token
         self.websocket_url: str = websocket_url
-        self.message_id: int = 1# has to be more than zero. 
+        self.message_id: int = 1# has to be more than zero. Has to increment. 
         self.subscribed_events: dict = {}# to retain ID's for subscribed events or triggers. 
 
     async def connect(self) -> None:
@@ -145,9 +145,41 @@ class SensorDataManager:
 
         pass
 
-    async def unsubscribe(self, event):
+    async def unsubscribe(self, event=None):
+        success = False
         """
         A method to unsubscribe from a signular event or trigger. 
+        The event parameter determines what to unsubscribe from.
+        If the event is a single string then one single event is unsubscribed from. 
+        If the event is a list then the list of events is unsubscribed from. 
+        If the event is None then all are unsubscribed from (DEFAULT)
+        """
+
+        if event == str:
+            self.__unsubscribe_single()
+        
+        elif event == list:
+            self.__unsubscribe_list()
+        
+        elif event == None:
+            self.__unsubscribe_all()
+
+        else:
+            raise ValueError('Please enter either a string, list or None')
+
+
+
+        pass
+
+    async def __unsubscribe_single(self, event_list:str):
+        """
+        A method to unsubscribe from a list of events
+        """
+        pass
+
+    async def __unsubscribe_list(self, event_list:list):
+        """
+        A method to unsubscribe from a list of events
         """
         pass
 
