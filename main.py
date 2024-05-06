@@ -1,6 +1,7 @@
 import asyncio
 import yaml
 from SensorDataManager import SensorDataManager
+from DatabaseManager import DatabaseManager
 from dotenv import dotenv_values
 
 
@@ -27,6 +28,30 @@ async def main():
     auth = config.get("HASS_IO_AUTH_TOKEN")
     url = config.get("HASS_IO_HOSTNAME")
     yaml_file = config.get("YAML_NAME")
+
+    db_name = config.get("DATABASE_NAME")
+    db_host = config.get("DATABASE_HOST")
+    db_port = config.get("DATABASE_PORT")
+    db_user = config.get("DATABASE_USER")
+    db_password = config.get("DATABASE_PASSWORD")
+
+    credentials_dict = {
+        'db_name':db_name,
+        'db_host':db_host,
+        'db_port':db_port,
+        'db_user':db_user,
+        'db_password':db_password
+    }
+
+    databasemanager = DatabaseManager(credentials=credentials_dict)# instantiate an object for the database
+    
+    exit()
+
+    timeseries_schema = config.get("TIMESERIES_SCHEMA")
+    timeserties_table = config.get("TIMESERIES_TABLE")
+
+
+
     datamanager = SensorDataManager(auth_token=auth, websocket_url=url)
     await datamanager.connect()
 

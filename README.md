@@ -15,8 +15,9 @@ HASS_IO_HOSTNAME = ws://homeassistant.local:8123/api/websocket
 YAML_NAME = subscriptions.yaml
 ```
 # TODO:
-- Sensor object
+- Sensor class
     - Create virtual sensors for testing
-- Pulling data from timescaleDB
+- DatabaseManager class
+    - pull data from TimescaleDB
     - 
 - 
