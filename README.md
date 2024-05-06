@@ -17,7 +17,6 @@ YAML_NAME = subscriptions.yaml
 # TODO:
 - Sensor object
     - Create virtual sensors for testing
-
 - Pulling data from timescaleDB
     - 
 - 
