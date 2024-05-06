@@ -1,10 +1,12 @@
 """
-A class to manage timeseries sensor data from the timescaleDB database. 
+The `DatabaseManager` class in Python initializes a database engine with given credentials,
+retrieves database tables, and fetches time-series data for a specific sensor entity.
 """
 from sqlalchemy import create_engine, Table, MetaData, URL
 from sqlalchemy.sql import table, column, select
 from sqlalchemy.exc import SQLAlchemyError
 import pandas as pd
+
 
 class DatabaseManager:
     def __init__(self, credentials:dict) -> None:  
@@ -26,7 +28,6 @@ class DatabaseManager:
         self.engine = self.connect_to_database()
         self.ltss_table = self.get_database_table('ltss')#default hypertable for homeassistant ltss addon
         
-
     def connect_to_database(self):
         """
         The function `connect_to_database` creates and returns a SQLAlchemy database engine, handling any
