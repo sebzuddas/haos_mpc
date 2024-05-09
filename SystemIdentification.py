@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import normalize
 
 from sysidentpy.model_structure_selection import FROLS
 from sysidentpy.basis_function._basis_function import Polynomial
@@ -11,6 +12,8 @@ from sysidentpy.utils.generate_data import get_siso_data
 from sysidentpy.utils.display_results import results
 from sysidentpy.utils.plotting import plot_residues_correlation, plot_results
 from sysidentpy.residues.residues_correlation import (compute_residues_autocorrelation,compute_cross_correlation)
+
+import pysindy as ps
 
 
 class SystemIdentification:
@@ -41,8 +44,11 @@ class SystemIdentification:
         try:
             if self.input_data.shape[0] != self.output_data.shape[0]:# test that both sets of data have the same number of rows
                 raise IndexError
+            self.time_step = self.input_data.shape[0] # assign the number of rows to the time steps for the data if both inputs and outputs match
         except IndexError:
                 print(f'input_datas:{input_data.index} and output_datas :{output_data.index} have different amounts of datapoints.')
+
+        
 
 
 
@@ -83,6 +89,54 @@ class SystemIdentification:
             )
         
         print(self.results)
+
+
+    def fit_model_pysindy(self):
+        # Example indicators, replace with relevant data if needed
+        indicator_1 = np.ones_like(self.training_input_data) ## v2
+        indicator_2 = np.ones_like(self.training_output_data)## v2
+
+        # Candidate Models...
+        # Instantiate the model using a polynomial library
+        poly_order = 1  # Adjust based on your problem
+        feature_library = ps.PolynomialLibrary(degree=poly_order)
+
+        lag = 1
+
+        # Combine indicators and lagged data## v2
+        X_indicators = np.column_stack([np.roll(indicator_1, i) for i in range(1)])
+        X_input = np.column_stack([np.roll(self.training_input_data, i) for i in range(lag + 1)])
+        X_output = np.column_stack([np.roll(self.training_output_data, i) for i in range(lag + 1)])
+
+        # Combine all features
+        X = np.hstack([X_indicators, X_input[:, -1:], X_output[:, -1:]])## v2
+
+
+        # # stack lagged data
+        # X = np.column_stack([np.roll(self.training_input_data, i) for i in range(lag+1)] + 
+        #                     [np.roll(self.training_output_data, i) for i in range(lag+1)])
+
+        # Dynamically generate feature names based on the matrix structure#v2
+        feature_names_indicators = [f"indicator_{i + 1}" for i in range(X_indicators.shape[1])]
+        feature_names_input = [f"input_lag_{i}" for i in range(lag + 1)]
+        feature_names_output = [f"output_lag_{i}" for i in range(lag + 1)]
+        feature_names = feature_names_indicators + feature_names_input + feature_names_output
+
+
+        #remove rows due to shifting
+        X = X[lag:, :]
+        self.training_output_data = self.training_output_data[lag:]
+
+        optimizer = ps.STLSQ(threshold=0.01)#where threshold is Lambda
+
+        model = ps.SINDy(feature_names=feature_names, optimizer=optimizer, feature_library=feature_library)#, feature_library=feature_library
+
+        model.fit(X, t=1)
+
+        print(X)
+
+        model.print()
+        print('test')
 
 
 

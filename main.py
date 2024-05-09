@@ -84,17 +84,18 @@ async def main():
 
 
     radiator_sensor = radiator_sensor.dropna(subset=['state'])
+    # radiator_sensor = radiator_sensor[radiator_sensor["state"] != 0]# drops rows where state is zero. 
 
     radiator_input = radiator_sensor[["input"]]
     radiator_output = radiator_sensor[["state"]]
     
     test = SystemIdentification(radiator_input, radiator_output)
-    test.fit_model()
+    test.fit_model_pysindy()
 
 
 
 ### show plot
-    plt.show()
+    # plt.show()
     exit()
 
     timeseries_schema = config.get("TIMESERIES_SCHEMA")
