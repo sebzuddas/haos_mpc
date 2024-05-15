@@ -4,11 +4,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-from SensorDataManager import SensorDataManager
-from DatabaseManager import DatabaseManager
+# import data handlers
+from data_management.SensorDataManager import SensorDataManager
+from data_management.DatabaseManager import DatabaseManager
+from peripherals.Sensor import Sensor
+
 from dotenv import dotenv_values
 
-from SystemIdentification import SystemIdentification
+from control.SystemIdentification import SystemIdentification
 
 
 async def init_subscriptions(datamanager:object, subscriptions_file:str):
@@ -80,12 +83,13 @@ async def main():
     
     #getting the switch data
     switch = databasemanager.get_sensor_timeseries("switch.smart_plug_radiator")
-    print(switch)
+    print(switch.to_string())
     
-    print(real_feel_temp)
+    print(real_feel_temp.to_string())
     exit()
 
     radiator_sensor["state"] = pd.to_numeric(radiator_sensor["state"])
+
     radiator_sensor["state"] = radiator_sensor["state"].rolling(window=5).mean()
 
     radiator_sensor["input"] = np.where(radiator_sensor["state"]!=0, 1, 0)# make an input when the radiator is on
