@@ -53,8 +53,8 @@ async def main():
     }
 
 
-    databasemanager = DatabaseManager(credentials=credentials_dict)# instantiate an object for the database
-    # table = databasemanager.get_database_table('ltss')#this returns an sqlalchemy table object. 
+    dbmanager = DatabaseManager(credentials=credentials_dict)# instantiate an object for the database
+    # table = dbmanager.get_database_table('ltss')#this returns an sqlalchemy table object. 
     
     # print(f"Table Name: {table.name}")
     # for column in table.columns:
@@ -62,7 +62,7 @@ async def main():
 
 ### Computers
     """
-    computers_sensor = databasemanager.get_sensor_timeseries("sensor.smart_plug_computers_current_consumption")
+    computers_sensor = dbmanager.get_sensor_timeseries("sensor.smart_plug_computers_current_consumption")
 
     computers_sensor = computers_sensor[computers_sensor.state != 'unavailable']# drop unavailable
 
@@ -75,14 +75,19 @@ async def main():
 
 ### Radiators
         
-    radiator_sensor = databasemanager.get_sensor_timeseries("sensor.smart_plug_radiator_current_consumption")
+
+    radiator = Sensor(dbmanager, identifier="sensor.smart_plug_radiator_current_consumption")
+    radiator.get_latest_state()
+
+    exit()
+    radiator_sensor = dbmanager.get_sensor_timeseries("sensor.smart_plug_radiator_current_consumption")
 
     #getting the real feel temperature and adding it to sysid
-    real_feel_temp = databasemanager.get_sensor_timeseries("sensor.home_realfeel_temperature")
+    real_feel_temp = dbmanager.get_sensor_timeseries("sensor.home_realfeel_temperature")
     real_feel_temp["state"] = pd.to_numeric(real_feel_temp["state"])
     
     #getting the switch data
-    switch = databasemanager.get_sensor_timeseries("switch.smart_plug_radiator")
+    switch = dbmanager.get_sensor_timeseries("switch.smart_plug_radiator")
     print(switch.to_string())
     
     print(real_feel_temp.to_string())

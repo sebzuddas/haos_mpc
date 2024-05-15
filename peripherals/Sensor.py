@@ -15,7 +15,7 @@ from data_management.DatabaseManager import DatabaseManager
 
 
 class Sensor:
-    def __init__(self, identifier=None, virtual=False, **attributes):
+    def __init__(self, dbmanager, identifier=None, virtual=False, **attributes):
         
         self.virtual = virtual
         self.identifier = identifier
@@ -24,7 +24,7 @@ class Sensor:
         
         # If the sensor is real
         if identifier != None:
-            self.df = DatabaseManager.get_sensor_timeseries(identifier)
+            self.df = dbmanager.get_sensor_timeseries(identifier)
         
         # if the sensor is virtual
 
