@@ -74,14 +74,23 @@ async def main():
         
     radiator_sensor = databasemanager.get_sensor_timeseries("sensor.smart_plug_radiator_current_consumption")
 
-
+    #getting the real feel temperature and adding it to sysid
+    real_feel_temp = databasemanager.get_sensor_timeseries("sensor.home_realfeel_temperature")
+    real_feel_temp["state"] = pd.to_numeric(real_feel_temp["state"])
+    
+    #getting the switch data
+    switch = databasemanager.get_sensor_timeseries("switch.smart_plug_radiator")
+    print(switch)
+    
+    print(real_feel_temp)
+    exit()
 
     radiator_sensor["state"] = pd.to_numeric(radiator_sensor["state"])
+    radiator_sensor["state"] = radiator_sensor["state"].rolling(window=5).mean()
 
     radiator_sensor["input"] = np.where(radiator_sensor["state"]!=0, 1, 0)# make an input when the radiator is on
 
     radiator_sensor[["state", "input"]].plot()# plot the sensors' state and input vars
-
 
     radiator_sensor = radiator_sensor.dropna(subset=['state'])
     # radiator_sensor = radiator_sensor[radiator_sensor["state"] != 0]# drops rows where state is zero. 

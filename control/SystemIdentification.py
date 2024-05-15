@@ -99,7 +99,7 @@ class SystemIdentification:
         # Candidate Models...
         # Instantiate the model using a polynomial library
         poly_order = 1  # Adjust based on your problem
-        feature_library = ps.PolynomialLibrary(degree=poly_order)
+        feature_library = ps.PolynomialLibrary(degree=poly_order, include_interaction=True)
 
         lag = 1
 
@@ -127,9 +127,17 @@ class SystemIdentification:
         X = X[lag:, :]
         self.training_output_data = self.training_output_data[lag:]
 
-        optimizer = ps.STLSQ(threshold=0.01)#where threshold is Lambda
+        optimizer = ps.STLSQ(threshold=0.21)#where threshold is Lambda
 
-        model = ps.SINDy(feature_names=feature_names, optimizer=optimizer, feature_library=feature_library)#, feature_library=feature_library
+        differentiation_method = ps.FiniteDifference()#decide on the differentiation method to be used. 
+
+        model = ps.SINDy(
+            feature_names=feature_names,
+            optimizer=optimizer, 
+            feature_library=feature_library, 
+            differentiation_method=differentiation_method, 
+            use_cross_validation=True
+            )#, feature_library=feature_library
 
         model.fit(X, t=1)
 
