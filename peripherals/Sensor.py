@@ -26,8 +26,10 @@ class Sensor(Peripheral):
         if identifier:
             self.df = dbmanager.get_timeseries(identifier)
             self.timeseries = self.df.reset_index()[['time','state']]
+            self.timeseries = self.timeseries.dropna()
             self.initialise_attributes_from_df()
-        
+            self.x = np.array(self.timeseries.index)#should be date
+            self.y = np.array(self.timeseries["state"])#should be value
         # if the sensor is virtual
 
     ### Virtual Sensor Methods
@@ -63,7 +65,7 @@ class Sensor(Peripheral):
             if first_valid_index is not None:
                 attributes = self.df.loc[first_valid_index, 'attributes']
                 self.update_attributes(attributes)
-
+        
 
     ### Agnostic Methods
     
@@ -82,14 +84,24 @@ class Sensor(Peripheral):
             for key, value in attributes.items():
                 setattr(self, key, value)
     
-    def get_timeseries(self):
+    def get_timeseries(self, numpy=False):
         """
-        The function `get_timeseries` returns a timeseries with any missing values removed.
-        :return: The `timeseries` variable, which is the `self.timeseries` DataFrame with any missing values
-        (NaNs) removed, is being returned.
+        The function `get_timeseries` returns the timeseries data either as a list or as numpy arrays based
+        on the `numpy` parameter.
+        
+        :param numpy: It looks like the `numpy` parameter is used to determine whether the function should
+        return the timeseries data as a numpy array or not. If `numpy` is set to `False`, the function will
+        return the timeseries data as it is. If `numpy` is set to `True`,, defaults to False (optional)
+        :return: The code is returning the timeseries data if the `numpy` parameter is set to `False`. If
+        `numpy` is set to `True`, the code seems to be incomplete as it does not specify what should be
+        returned when `numpy` is `True`. It appears that there is a missing return statement or logic to
+        handle the case when `numpy` is `True`.
         """
-        timeseries = self.timeseries.dropna()
-        return timeseries
+        if not numpy:
+            return self.timeseries
+        
+        else:
+            return self.x, self.y
 
     def get_state_at_time(self, time):
         pass

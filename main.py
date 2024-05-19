@@ -13,6 +13,7 @@ from peripherals.Actuator import Actuator
 from dotenv import dotenv_values
 
 from control.SystemIdentification import SystemIdentification
+from control.SignalProcessing import SignalProcessing
 
 
 async def init_subscriptions(datamanager:object, subscriptions_file:str):
@@ -31,6 +32,9 @@ async def init_subscriptions(datamanager:object, subscriptions_file:str):
 async def get_database_data():
     pass
 
+
+async def make_column_numeric(dataframe:object, colname:str = 'state'):
+    return pd.to_numeric(dataframe[colname])
 
 async def main():
 
@@ -77,17 +81,28 @@ async def main():
 ### Radiators
         
 
-    radiator_consumption = Sensor(dbmanager=dbmanager, identifier="sensor.smart_plug_radiator_current_consumption")
-    
-    radiator_switch = Actuator(dbmanager=dbmanager, identifier="switch.smart_plug_radiator")
+    sensor_name_list = [
+        "sensor.smart_plug_radiator_current_consumption", 
+        "sensor.esphome_web_38fb3c_bme280_temperature",
+        "sensor.home_realfeel_temperature",
+        ]
 
-    temperature = Sensor(dbmanager=dbmanager, identifier="sensor.esphome_web_38fb3c_bme280_temperature")
+    actuator_name_list = ["switch.smart_plug_radiator"]
+
+    radiator_consumption = Sensor(dbmanager=dbmanager, identifier="sensor.smart_plug_radiator_current_consumption")
+
+    room_temperature = Sensor(dbmanager=dbmanager, identifier="sensor.esphome_web_38fb3c_bme280_temperature")
 
     outside_temperature = Sensor(dbmanager=dbmanager, identifier="sensor.home_realfeel_temperature")
 
-    temperature_timeseries = temperature.get_timeseries()
+    radiator_switch = Actuator(dbmanager=dbmanager, identifier="switch.smart_plug_radiator")
+
+    room_temperature_timeseries = room_temperature.get_timeseries()
+    room_temperature_x, room_temperature_y = room_temperature.get_timeseries(numpy=True)
+
     
-    # print(temperature_timeseries)
+
+
 
 
     exit()
@@ -97,7 +112,6 @@ async def main():
     real_feel_temp["state"] = pd.to_numeric(real_feel_temp["state"])
     
     #getting the switch data
-    switch = dbmanager.get_sensor_timeseries("switch.smart_plug_radiator")
     print(switch.to_string())
     
     print(real_feel_temp.to_string())
@@ -106,8 +120,6 @@ async def main():
     radiator_sensor["state"] = pd.to_numeric(radiator_sensor["state"])
 
     radiator_sensor["state"] = radiator_sensor["state"].rolling(window=5).mean()
-
-    radiator_sensor["input"] = np.where(radiator_sensor["state"]!=0, 1, 0)# make an input when the radiator is on
 
     radiator_sensor[["state", "input"]].plot()# plot the sensors' state and input vars
 

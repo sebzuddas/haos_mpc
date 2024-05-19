@@ -7,17 +7,25 @@ from scipy import signal
 import pywt
 
 class SignalProcessing:
-    def __init__(self) -> None:
-        pass
 
+    @staticmethod
     def moving_average(self, df) -> pd.DataFrame:
         pass
 
+    @staticmethod
     def detrend(self, df)-> pd.DataFrame:
+        #TODO: finish the detrend method
         return signal.detrend()
-
-    def fourier_transform(self) -> pd.DataFrame:
+    
+    @staticmethod
+    def fourier_transform(self, plot:bool=False) -> pd.DataFrame:
+        pass
+    
+    @staticmethod
+    def filter_data(self, frequency_low:float, frequency_high:float, plot:bool=False) -> pd.DataFrame:
         pass
 
-    def filter_data(self, frequency_low:float, frequency_high:float) -> pd.DataFrame:
+    @staticmethod
+    def __plot(self):
+        #plot a given output
         pass
