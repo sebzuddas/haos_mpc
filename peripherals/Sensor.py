@@ -26,6 +26,7 @@ class Sensor(Peripheral):
         if identifier:
             self.df = dbmanager.get_timeseries(identifier)
             self.timeseries = self.df.reset_index()[['time','state']]
+            self.timeseries['state']=pd.to_numeric(self.timeseries["state"], errors='coerce').values
             self.timeseries = self.timeseries.dropna()
             self.initialise_attributes_from_df()
             self.x = np.array(self.timeseries.index)#should be date

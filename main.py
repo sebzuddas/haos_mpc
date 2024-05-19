@@ -99,8 +99,15 @@ async def main():
 
     room_temperature_timeseries = room_temperature.get_timeseries()
     room_temperature_x, room_temperature_y = room_temperature.get_timeseries(numpy=True)
+    room_temperature_y_detrend = SignalProcessing.detrend(room_temperature_y)
 
+    # plt.plot(room_temperature_x, room_temperature_y, color='firebrick', label='non detrend')
+    # plt.plot(room_temperature_x, room_temperature_y_detrend, color='navy', label='detrend')
+    # plt.legend()
+    # plt.show()
+    SignalProcessing.fourier_transform(room_temperature_y, plot=True)
     
+
 
 
 

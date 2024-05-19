@@ -13,12 +13,25 @@ class SignalProcessing:
         pass
 
     @staticmethod
-    def detrend(self, df)-> pd.DataFrame:
-        #TODO: finish the detrend method
-        return signal.detrend()
+    def detrend(y)-> pd.DataFrame:
+        return signal.detrend(y)
     
     @staticmethod
-    def fourier_transform(self, plot:bool=False) -> pd.DataFrame:
+    def fourier_transform(y, plot:bool=False) -> pd.DataFrame:
+        y_detrend = SignalProcessing.detrend(y)
+        FFT =np.fft.fft(y_detrend)
+        new_N=int(len(FFT)/2) 
+        f_nat=1
+        new_X = np.linspace(10**-12, f_nat/2, new_N, endpoint=True)
+        new_Xph=1.0/(new_X)
+        FFT_abs=np.abs(FFT)
+        plt.plot(new_Xph,2*FFT_abs[0:int(len(FFT)/2.)]/len(new_Xph),color='black')
+        plt.xlabel('Period ($h$)',fontsize=20)
+        plt.ylabel('Amplitude',fontsize=20)
+        plt.title('(Fast) Fourier Transform Method Algorithm',fontsize=20)
+        plt.grid(True)
+        if plot:
+            plt.show()
         pass
     
     @staticmethod
