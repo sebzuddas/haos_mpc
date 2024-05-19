@@ -62,7 +62,7 @@ class DatabaseManager:
             print(f"Error fetching table {table}: {e}")
             return None
             
-    def get_sensor_timeseries(self, sensor: str, table: str='ltss') -> pd.DataFrame:
+    def get_timeseries(self, sensor: str, table: str='ltss') -> pd.DataFrame:
             """
             Retrieve time-series data for a specific sensor (entity) and return as a Pandas DataFrame.
 
@@ -94,6 +94,10 @@ class DatabaseManager:
 
             return df
 
+    def get_list(self):
+        #TODO: implement getting a list of all appropriate elements ie sensors/actuators
+        pass
+
     def _resample_timeseries(self, df) -> pd.DataFrame:
         """
         This Python function resamples a time series DataFrame to a common time interval based on the most
@@ -111,7 +115,15 @@ class DatabaseManager:
         rounded_interval = time_diffs.mode()[0]# find most common time interval
         common_interval_seconds = round(rounded_interval.total_seconds()) # find the most common and round
         rounded_sample_time = pd.Timedelta(seconds=common_interval_seconds) # make these a Timedelta object
+        
+        #TODO: handle this properly, why is it returning div zero errors?
+        try:
+            
+            df = df.resample(rounded_sample_time).ffill()   
+            return df
+        except ZeroDivisionError:
+            return df
 
-        df = df.resample(rounded_sample_time).ffill()   
 
-        return df
+
+        

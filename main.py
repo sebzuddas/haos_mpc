@@ -8,6 +8,7 @@ import numpy as np
 from data_management.SensorDataManager import SensorDataManager
 from data_management.DatabaseManager import DatabaseManager
 from peripherals.Sensor import Sensor
+from peripherals.Actuator import Actuator
 
 from dotenv import dotenv_values
 
@@ -76,11 +77,20 @@ async def main():
 ### Radiators
         
 
-    radiator = Sensor(dbmanager, identifier="sensor.smart_plug_radiator_current_consumption")
-    radiator.get_latest_state()
+    radiator_consumption = Sensor(dbmanager=dbmanager, identifier="sensor.smart_plug_radiator_current_consumption")
+    
+    radiator_switch = Actuator(dbmanager=dbmanager, identifier="switch.smart_plug_radiator")
+
+    temperature = Sensor(dbmanager=dbmanager, identifier="sensor.esphome_web_38fb3c_bme280_temperature")
+
+    outside_temperature = Sensor(dbmanager=dbmanager, identifier="sensor.home_realfeel_temperature")
+
+    temperature_timeseries = temperature.get_timeseries()
+    
+    # print(temperature_timeseries)
+
 
     exit()
-    radiator_sensor = dbmanager.get_sensor_timeseries("sensor.smart_plug_radiator_current_consumption")
 
     #getting the real feel temperature and adding it to sysid
     real_feel_temp = dbmanager.get_sensor_timeseries("sensor.home_realfeel_temperature")

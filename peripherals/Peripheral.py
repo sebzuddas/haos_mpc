@@ -7,6 +7,10 @@ class Peripheral(ABC):
         pass
 
     @abstractmethod
+    def update_attributes(self, attributes):
+        pass
+
+    @abstractmethod
     def get_latest_state(self):
         pass
 

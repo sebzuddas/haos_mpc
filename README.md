@@ -14,10 +14,22 @@ HASS_IO_AUTH_TOKEN = YOUR AUTH KEY
 HASS_IO_HOSTNAME = ws://homeassistant.local:8123/api/websocket
 YAML_NAME = subscriptions.yaml
 ```
+
 # TODO:
 - Sensor class
     - Create virtual sensors for testing
-- DatabaseManager class
-    - pull data from TimescaleDB
     - 
-- 
+
+- Actuator Class
+    - Send commands to HAOS via the websocket/api.
+
+- DatabaseManager class
+    - ~~pull data from TimescaleDB~~
+    - Get list of database components from TimescaleDB
+
+
+
+- Real-time data
+    - Use the websocket functionality of HAOS to allow the system to function live
+    - Making the sensor class be able to collect real-time data
+
