@@ -105,7 +105,7 @@ async def main():
     # plt.plot(room_temperature_x, room_temperature_y_detrend, color='navy', label='detrend')
     # plt.legend()
     # plt.show()
-    SignalProcessing.fourier_transform(room_temperature_y, plot=True)
+    SignalProcessing.fourier_transform(room_temperature_y, timestep=30, plot=True)
     
 
 

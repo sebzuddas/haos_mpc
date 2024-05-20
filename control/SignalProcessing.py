@@ -13,11 +13,14 @@ class SignalProcessing:
         pass
 
     @staticmethod
-    def detrend(y)-> pd.DataFrame:
-        return signal.detrend(y)
+    def detrend(y, plot:bool = False)-> pd.DataFrame:
+        if plot:
+            pass
+        else:
+            return signal.detrend(y)
     
     @staticmethod
-    def fourier_transform(y, plot: bool = False) -> pd.DataFrame:
+    def fourier_transform(y, timestep: int = 1, plot: bool = False) -> pd.DataFrame:
         # Detrend the data
         y_detrend = SignalProcessing.detrend(y)
 
@@ -26,7 +29,6 @@ class SignalProcessing:
 
         # Get frequency components
         n = len(y_detrend)
-        timestep = 1  # assuming a timestep of 1; adjust if your timestep is different
         freq = np.fft.fftfreq(n, d=timestep)
 
         # Normalize the FFT output
