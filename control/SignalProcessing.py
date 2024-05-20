@@ -4,16 +4,45 @@ import numpy as np
 import matplotlib.pyplot as plt 
 import pandas as pd 
 from scipy import signal
+from scipy.signal import butter, lfilter, filtfilt
+
 import pywt
 
 class SignalProcessing:
+
+    @staticmethod
+    def __butter_lowpass(cutoff, fs, order):
+        return butter(order,cutoff, fs=fs, btype='low', analog=False)
+
+    @staticmethod
+    def butter_lowpass_filter(data:np.array,  cutoff, timestep:int=1, order=5, plot=False):
+        data = SignalProcessing.detrend(data)
+        fs = 1/timestep #sample frequency
+        #TODO: to avoid lag you must flip the output and pass it through the filter again. 
+        b, a = SignalProcessing.__butter_lowpass(cutoff, fs, order=order)
+        y = filtfilt(b, a, data)
+
+        
+        n = len(data)
+        T = int(n/fs)
+        t = np.linspace(0, T, n, endpoint=False)
+
+
+
+        if plot:
+            plt.plot(t, data, 'b-', label='data')
+            plt.plot(t, y, 'g-', linewidth=2, label='filtered data')
+        
+        else:
+            return y
+    
 
     @staticmethod
     def moving_average(self, df) -> pd.DataFrame:
         pass
 
     @staticmethod
-    def detrend(y, plot:bool = False)-> pd.DataFrame:
+    def detrend(y, plot:bool = False):
         if plot:
             pass
         else:
@@ -48,16 +77,18 @@ class SignalProcessing:
             plt.grid(True)
             plt.show()
 
-        # Return the DataFrame with frequency and amplitude for further analysis if needed
-        return pd.DataFrame({'Frequency': freq, 'Amplitude': FFT_abs})
-
-
+        
+        else:
+            # Return the DataFrame with frequency and amplitude for further analysis if needed
+            return pd.DataFrame({'Frequency': freq, 'Amplitude': FFT_abs})
+            
     
+
     @staticmethod
-    def filter_data(self, frequency_low:float, frequency_high:float, plot:bool=False) -> pd.DataFrame:
+    def filter_data(frequency_low:float, frequency_high:float, plot:bool=False) -> pd.DataFrame:
         pass
 
     @staticmethod
-    def __plot(self):
+    def __plot():
         #plot a given output
         pass

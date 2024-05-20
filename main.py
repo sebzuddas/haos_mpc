@@ -105,12 +105,10 @@ async def main():
     # plt.plot(room_temperature_x, room_temperature_y_detrend, color='navy', label='detrend')
     # plt.legend()
     # plt.show()
-    SignalProcessing.fourier_transform(room_temperature_y, timestep=30, plot=True)
     
-
-
-
-
+    # SignalProcessing.fourier_transform(room_temperature_y, timestep=30, plot=True)
+    filtered_data = SignalProcessing.butter_lowpass_filter(data=room_temperature_y, cutoff=0.0025, timestep=30, plot=True)
+    # SignalProcessing.fourier_transform(filtered_data, timestep=30, plot=True)
 
     exit()
 
