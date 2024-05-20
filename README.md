@@ -25,6 +25,7 @@ YAML_NAME = subscriptions.yaml
 
 - Actuator Class
     - Send commands to HAOS via the websocket/api.
+    - Implement constraint attributes
 
 - DatabaseManager class
     - ~~pull data from TimescaleDB~~
