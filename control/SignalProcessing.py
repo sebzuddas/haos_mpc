@@ -18,16 +18,12 @@ class SignalProcessing:
     def butter_lowpass_filter(data:np.array,  cutoff, timestep:int=1, order=5, plot=False):
         data = SignalProcessing.detrend(data)
         fs = 1/timestep #sample frequency
-        #TODO: to avoid lag you must flip the output and pass it through the filter again. 
         b, a = SignalProcessing.__butter_lowpass(cutoff, fs, order=order)
-        y = filtfilt(b, a, data)
+        y = filtfilt(b, a, data) # to avoid lag you must flip the output and pass it through the filter again. 
 
-        
         n = len(data)
         T = int(n/fs)
         t = np.linspace(0, T, n, endpoint=False)
-
-
 
         if plot:
             plt.plot(t, data, 'b-', label='data')
