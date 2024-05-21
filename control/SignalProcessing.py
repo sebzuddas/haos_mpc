@@ -42,6 +42,21 @@ class SignalProcessing:
         else:
             return y
     
+    @staticmethod
+    def psd(data:np.array):
+        #TODO: implement power spectral density
+        pass
+
+    @staticmethod
+    def auto_correlation(data:np.array):
+        #TODO: implement auto correlation function
+        pass
+
+    @staticmethod
+    def cross_correlation(data:np.array):
+        #TODO: implement cross correlation function
+        pass
+
 
     @staticmethod
     def moving_average(self, df) -> pd.DataFrame:
@@ -50,6 +65,7 @@ class SignalProcessing:
     @staticmethod
     def detrend(y, plot:bool = False):
         if plot:
+            #TODO: implement plotting the detrend vs the standard signal
             pass
         else:
             return signal.detrend(y)

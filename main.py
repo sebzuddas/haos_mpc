@@ -124,19 +124,17 @@ async def main():
     SignalProcessing.butter_lowpass_filter(data=radiator_consumption_timeseries_y, cutoff=0.02, timestep=radiator_consumption_timestep, plot=True)
 
 
+    #TODO: make timeseries from sensors and actuators align
+    #TODO: cutoff time to consider only when the heater is on and when it's turned off?
+    #TODO: Investigate cleaning data for system identification. 
+    #TODO: Investigate multi-rate system identificaiton
+
+
 
     exit()
 
 
-    radiator_sensor["state"] = radiator_sensor["state"].rolling(window=5).mean()
 
-    radiator_sensor[["state", "input"]].plot()# plot the sensors' state and input vars
-
-    radiator_sensor = radiator_sensor.dropna(subset=['state'])
-    # radiator_sensor = radiator_sensor[radiator_sensor["state"] != 0]# drops rows where state is zero. 
-
-    radiator_input = radiator_sensor[["input"]]
-    radiator_output = radiator_sensor[["state"]]
     
     test = SystemIdentification(radiator_input, radiator_output)
     test.fit_model_pysindy()
@@ -152,6 +150,7 @@ async def main():
 
 
 
+### websocket code. 
     datamanager = SensorDataManager(auth_token=__auth, websocket_url=url)
     await datamanager.connect()
 
