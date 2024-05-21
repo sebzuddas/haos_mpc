@@ -15,20 +15,30 @@ class SignalProcessing:
         return butter(order,cutoff, fs=fs, btype='low', analog=False)
 
     @staticmethod
-    def butter_lowpass_filter(data:np.array,  cutoff, timestep:int=1, order=5, plot=False):
+    def signaltonoise(a, axis=0, ddof=0, detrend=False):
+        if detrend:
+            a = SignalProcessing.detrend(a)
+        a = np.asanyarray(a)
+        m = a.mean(axis)
+        sd = a.std(axis=axis, ddof=ddof)
+        return np.where(sd == 0, 0, m/sd)
+
+    #TODO: band pass
+
+    #TODO: high pass
+
+    @staticmethod
+    def butter_lowpass_filter(data:np.array,  cutoff, timestep:int=1, order:int=5, plot:bool=False):
         data = SignalProcessing.detrend(data)
         fs = 1/timestep #sample frequency
         b, a = SignalProcessing.__butter_lowpass(cutoff, fs, order=order)
-        y = filtfilt(b, a, data) # to avoid lag you must flip the output and pass it through the filter again. 
-
+        y = filtfilt(b, a, data) # to avoid lag you must flip the output and pass it through the filter again.
         n = len(data)
         T = int(n/fs)
         t = np.linspace(0, T, n, endpoint=False)
-
         if plot:
             plt.plot(t, data, 'b-', label='data')
             plt.plot(t, y, 'g-', linewidth=2, label='filtered data')
-        
         else:
             return y
     

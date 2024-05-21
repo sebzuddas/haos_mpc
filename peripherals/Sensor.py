@@ -80,6 +80,11 @@ class Sensor(Peripheral):
             return self.timeseries.iloc[-1]
         return None        
 
+    def get_timestep(self) -> float:
+        time_diffs = self.df.index.to_series().diff() # get the difference between sample times
+        rounded_interval = time_diffs.mode()[0]# find most common time interval
+        common_interval_seconds = round(rounded_interval.total_seconds()) # find the most common and round
+        return common_interval_seconds
 
     def update_attributes(self, attributes):
             for key, value in attributes.items():

@@ -89,40 +89,44 @@ async def main():
 
     actuator_name_list = ["switch.smart_plug_radiator"]
 
-    radiator_consumption = Sensor(dbmanager=dbmanager, identifier="sensor.smart_plug_radiator_current_consumption")
+
+    # radiator_switch = Actuator(dbmanager=dbmanager, identifier="switch.smart_plug_radiator")
+
+
+
+
+
 
     room_temperature = Sensor(dbmanager=dbmanager, identifier="sensor.esphome_web_38fb3c_bme280_temperature")
-
-    outside_temperature = Sensor(dbmanager=dbmanager, identifier="sensor.home_realfeel_temperature")
-
-    radiator_switch = Actuator(dbmanager=dbmanager, identifier="switch.smart_plug_radiator")
-
-    room_temperature_timeseries = room_temperature.get_timeseries()
     room_temperature_x, room_temperature_y = room_temperature.get_timeseries(numpy=True)
     room_temperature_y_detrend = SignalProcessing.detrend(room_temperature_y)
 
-    # plt.plot(room_temperature_x, room_temperature_y, color='firebrick', label='non detrend')
-    # plt.plot(room_temperature_x, room_temperature_y_detrend, color='navy', label='detrend')
-    # plt.legend()
-    # plt.show()
-    
     # SignalProcessing.fourier_transform(room_temperature_y, timestep=30, plot=True)
-    filtered_data = SignalProcessing.butter_lowpass_filter(data=room_temperature_y, cutoff=0.0025, timestep=30, plot=True)
-    # SignalProcessing.fourier_transform(filtered_data, timestep=30, plot=True)
+    # filtered_indoor_temp = SignalProcessing.butter_lowpass_filter(data=room_temperature_y, cutoff=0.0075, timestep=30)
+    # SignalProcessing.fourier_transform(filtered_indoor_temp, timestep=30, plot=True)
+    # print(SignalProcessing.signaltonoise(room_temperature_y), SignalProcessing.signaltonoise(room_temperature_y, detrend=True), SignalProcessing.signaltonoise(filtered_data))
+
+
+
+    outside_temperature = Sensor(dbmanager=dbmanager, identifier="sensor.home_realfeel_temperature")
+    outside_temp_timestep = outside_temperature.get_timestep()
+    outside_temp_timeseries_x, outside_temp_timeseries_y = outside_temperature.get_timeseries(numpy=True)
+    # SignalProcessing.fourier_transform(outside_temp_timeseries_y, outside_temp_timestep, plot=True)
+    # SignalProcessing.butter_lowpass_filter(data=outside_temp_timeseries_y, cutoff=0.0002, timestep=outside_temp_timestep, plot=True)
+
+
+    #TODO: radiator consumption data can't be filtered as above if you use the whole dataset since there are a lot of on/offs and it creates a lot of problems with overshooting.
+    #TODO: solution could be to collect the 'on' states together then distribute them once the data is filtered. This may cause issues with the timestep. 
+    radiator_consumption = Sensor(dbmanager=dbmanager, identifier="sensor.smart_plug_radiator_current_consumption")
+    radiator_consumption_timestep = radiator_consumption.get_timestep()
+    radiator_consumption_timeseries_x, radiator_consumption_timeseries_y = radiator_consumption.get_timeseries(numpy=True)
+    SignalProcessing.fourier_transform(radiator_consumption_timeseries_y, timestep=radiator_consumption_timestep, plot=True)
+    SignalProcessing.butter_lowpass_filter(data=radiator_consumption_timeseries_y, cutoff=0.02, timestep=radiator_consumption_timestep, plot=True)
+
+
 
     exit()
 
-    #getting the real feel temperature and adding it to sysid
-    real_feel_temp = dbmanager.get_sensor_timeseries("sensor.home_realfeel_temperature")
-    real_feel_temp["state"] = pd.to_numeric(real_feel_temp["state"])
-    
-    #getting the switch data
-    print(switch.to_string())
-    
-    print(real_feel_temp.to_string())
-    exit()
-
-    radiator_sensor["state"] = pd.to_numeric(radiator_sensor["state"])
 
     radiator_sensor["state"] = radiator_sensor["state"].rolling(window=5).mean()
 

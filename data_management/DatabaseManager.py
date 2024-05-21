@@ -116,9 +116,8 @@ class DatabaseManager:
         common_interval_seconds = round(rounded_interval.total_seconds()) # find the most common and round
         rounded_sample_time = pd.Timedelta(seconds=common_interval_seconds) # make these a Timedelta object
         
-        #TODO: handle this properly, why is it returning div zero errors?
+        #TODO: handle this properly, why do some timeseries returning div zero errors? Is it because not enough data is there?
         try:
-            
             df = df.resample(rounded_sample_time).ffill()   
             return df
         except ZeroDivisionError:
