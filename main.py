@@ -92,11 +92,6 @@ async def main():
 
     # radiator_switch = Actuator(dbmanager=dbmanager, identifier="switch.smart_plug_radiator")
 
-
-
-
-
-
     room_temperature = Sensor(dbmanager=dbmanager, identifier="sensor.esphome_web_38fb3c_bme280_temperature")
     room_temperature_x, room_temperature_y = room_temperature.get_timeseries(numpy=True)
     room_temperature_y_detrend = SignalProcessing.detrend(room_temperature_y)
@@ -106,14 +101,11 @@ async def main():
     # SignalProcessing.fourier_transform(filtered_indoor_temp, timestep=30, plot=True)
     # print(SignalProcessing.signaltonoise(room_temperature_y), SignalProcessing.signaltonoise(room_temperature_y, detrend=True), SignalProcessing.signaltonoise(filtered_data))
 
-
-
     outside_temperature = Sensor(dbmanager=dbmanager, identifier="sensor.home_realfeel_temperature")
     outside_temp_timestep = outside_temperature.get_timestep()
     outside_temp_timeseries_x, outside_temp_timeseries_y = outside_temperature.get_timeseries(numpy=True)
     # SignalProcessing.fourier_transform(outside_temp_timeseries_y, outside_temp_timestep, plot=True)
     # SignalProcessing.butter_lowpass_filter(data=outside_temp_timeseries_y, cutoff=0.0002, timestep=outside_temp_timestep, plot=True)
-
 
     #TODO: radiator consumption data can't be filtered as above if you use the whole dataset since there are a lot of on/offs and it creates a lot of problems with overshooting.
     #TODO: solution could be to collect the 'on' states together then distribute them once the data is filtered. This may cause issues with the timestep. 
@@ -130,10 +122,7 @@ async def main():
     #TODO: Investigate multi-rate system identificaiton
 
 
-
     exit()
-
-
 
     
     test = SystemIdentification(radiator_input, radiator_output)

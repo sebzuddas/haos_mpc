@@ -6,7 +6,7 @@ In looking to develop my own custom automation systems that close the loop betwe
 ## Control Systems
 HAOS offers very basic automations regarding turning switches on and off, or if the device supports it, tuning a specific variable (such as light intensity). These automations, although user friendly and fairly effective, have only the capabilities to implement hysteresis-based control systems. To develop a true 'intelligent' home, the home needs to be able to automatically control actuators based on **goals** and **constraints** set by the user. 
 
-The overall mission of this project is to implement advanced control techniques to make the *intelligent* home a reality. 
+The overall mission of this project is to implement advanced control techniques to make the *intelligent* home a reality that is accessible. 
 
 ## Finishing Line
 This project will be finished when it:
