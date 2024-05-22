@@ -95,10 +95,16 @@ async def main():
     room_temperature = Sensor(dbmanager=dbmanager, identifier="sensor.esphome_web_38fb3c_bme280_temperature")
     room_temperature_x, room_temperature_y = room_temperature.get_timeseries(numpy=True)
     room_temperature_y_detrend = SignalProcessing.detrend(room_temperature_y)
+    room_temperature_timestep = room_temperature.get_timestep()
+    SignalProcessing.psd(room_temperature_y, room_temperature_timestep, plot=True)
+
+
+
 
     # SignalProcessing.fourier_transform(room_temperature_y, timestep=30, plot=True)
-    # filtered_indoor_temp = SignalProcessing.butter_lowpass_filter(data=room_temperature_y, cutoff=0.0075, timestep=30)
+    filtered_indoor_temp = SignalProcessing.butter_lowpass_filter(data=room_temperature_y, cutoff=0.0075, timestep=30)
     # SignalProcessing.fourier_transform(filtered_indoor_temp, timestep=30, plot=True)
+    SignalProcessing.psd(filtered_indoor_temp, room_temperature_timestep, plot=True)
     # print(SignalProcessing.signaltonoise(room_temperature_y), SignalProcessing.signaltonoise(room_temperature_y, detrend=True), SignalProcessing.signaltonoise(filtered_data))
 
     outside_temperature = Sensor(dbmanager=dbmanager, identifier="sensor.home_realfeel_temperature")
