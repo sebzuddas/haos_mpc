@@ -22,7 +22,7 @@ In looking to develop my own custom automation systems that close the loop betwe
 ## Finishing Line
 This project will be finished when it:
 - Can deployed as a container
-- Can pull data from TimescaleDB set up on HAOS
+- Can pull data from TimescaleDB that is set up on HAOS
 - Can take user inputs for the optimisation
 - Can perform live system identificaiotn
 - Can perform adaptive control based on the system identificaiton
