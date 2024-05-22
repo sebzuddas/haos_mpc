@@ -1,12 +1,23 @@
 # NOTE: THIS IS A WORK IN PROGRESS!
 
+
+
 # Introduction
-In looking to develop my own custom automation systems that close the loop between sensors and actuators in HomeAssistant OS (HAOS), I saw the need to develop my own scripts that would enable me to access live HAOS sensor data in near-real-time. The ![websocket](https://developers.home-assistant.io/docs/api/websocket/#validate-config) API available shows the `.json` format for communicating with HAOS, but there didn't seem to be anything for doing this using Python. 
+The overall mission of this project is to implement advanced control techniques to make the *intelligent* home a reality that is accessible. 
 
 ## Control Systems
-HAOS offers very basic automations regarding turning switches on and off, or if the device supports it, tuning a specific variable (such as light intensity). These automations, although user friendly and fairly effective, have only the capabilities to implement hysteresis-based control systems. To develop a true 'intelligent' home, the home needs to be able to automatically control actuators based on **goals** and **constraints** set by the user. 
+HAOS offers basic automations regarding turning switches on and off, or if the device supports it, tuning a specific variable (such as light intensity). These automations, although user friendly and fairly effective, have only the capabilities to implement condition-based control systems. To develop a true 'intelligent' home, the home needs to be able to automatically control actuators based on **goals** and **constraints** set by the user. The vision is to have the user input some relatively basic parameters (for example, keep temperature at 20°C) and some weighted optimisations (for example, minimise energy consumption (30%) and keep me comfortable (70%)). The controller then deals with _when_ to turn the heating on, and may use data such as energy price, current room temperature, external temperature etc. 
 
-The overall mission of this project is to implement advanced control techniques to make the *intelligent* home a reality that is accessible. 
+![Example MPC Diagram](https://www.researchgate.net/profile/Timothy-Teatro/publication/317881347/figure/fig1/AS:613449121931324@1523269076591/A-block-diagram-for-a-system-with-MPC-controller_W640.jpg)
+
+### System Identification / Physics Informed ML
+To realise this, there are three key components of the system that need to function properly - the optimiser, the model and the state estimator (see figure above). All three rely on an accurate model of the system in question. To get the system model through data, system identification can be used, which requires adequate signal processing methods to minimise modelling errors. 
+
+
+
+## Accessing Live Sensor Data through Websockets
+In looking to develop my own custom automation systems that close the loop between sensors and actuators in HomeAssistant OS (HAOS), I saw the need to develop my own scripts that would enable me to access live HAOS sensor data in near-real-time. The [websocket](https://developers.home-assistant.io/docs/api/websocket/#validate-config) API available shows the `.json` format for communicating with HAOS, but there didn't seem to be anything for doing this using Python. 
+
 
 ## Finishing Line
 This project will be finished when it:
