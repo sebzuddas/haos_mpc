@@ -200,6 +200,14 @@ class SignalProcessing:
 
 
     @staticmethod
+    def align_timeseries(data:list):
+        #TODO: make a method that aligns a list of timeseries data that has different:
+        #TODO: starting and end points
+        #TODO: sample rates
+        #Is it better to have these as pandas dfs or a list of numpy arrays?
+        pass
+
+    @staticmethod
     def moving_average(self, df) -> pd.DataFrame:
         return NotImplementedError
 
