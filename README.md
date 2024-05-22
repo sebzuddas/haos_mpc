@@ -22,7 +22,7 @@ PySINDy emphasises the use of _sparse_ regression, and seems the most appropriat
 
 
 ## Accessing Live Sensor Data through Websockets
-In looking to develop my own custom automation systems that close the loop between sensors and actuators in HomeAssistant OS (HAOS), I saw the need to develop my own scripts that would enable me to access live HAOS sensor data in near-real-time. The [websocket](https://developers.home-assistant.io/docs/api/websocket/#validate-config) API available shows the `.json` format for communicating with HAOS, but there didn't seem to be anything for doing this using Python. 
+In looking to develop my own custom automation systems that close the loop between sensors and actuators in HomeAssistant OS (HAOS), I saw the need to develop my own scripts that would enable me to access live HAOS sensor data in near-real-time. This prevents consistently querying the database to gather live sensor data, which in turn could reduce the sampling rate to below Nyquist frequency depending on the sensor. The [websocket](https://developers.home-assistant.io/docs/api/websocket/#validate-config) API available shows the `.json` format for communicating with HAOS, but there didn't seem to be anything for doing this using Python. 
 
 
 # Finishing Line

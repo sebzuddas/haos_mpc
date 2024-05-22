@@ -96,30 +96,40 @@ async def main():
     room_temperature_x, room_temperature_y = room_temperature.get_timeseries(numpy=True)
     room_temperature_y_detrend = SignalProcessing.detrend(room_temperature_y)
     room_temperature_timestep = room_temperature.get_timestep()
-    SignalProcessing.psd(room_temperature_y, room_temperature_timestep, plot=True)
-
-
+    
+    
+    # SignalProcessing.auto_correlation(room_temperature_y, lags=1000, plot=True)
+    # SignalProcessing.psd(room_temperature_y, room_temperature_timestep, plot=True)
 
 
     # SignalProcessing.fourier_transform(room_temperature_y, timestep=30, plot=True)
     filtered_indoor_temp = SignalProcessing.butter_lowpass_filter(data=room_temperature_y, cutoff=0.0075, timestep=30)
+    # SignalProcessing.auto_correlation(filtered_indoor_temp, lags=1000, plot=True)
     # SignalProcessing.fourier_transform(filtered_indoor_temp, timestep=30, plot=True)
-    SignalProcessing.psd(filtered_indoor_temp, room_temperature_timestep, plot=True)
+    # SignalProcessing.psd(filtered_indoor_temp, room_temperature_timestep, plot=True)
+    
+    
     # print(SignalProcessing.signaltonoise(room_temperature_y), SignalProcessing.signaltonoise(room_temperature_y, detrend=True), SignalProcessing.signaltonoise(filtered_data))
 
     outside_temperature = Sensor(dbmanager=dbmanager, identifier="sensor.home_realfeel_temperature")
     outside_temp_timestep = outside_temperature.get_timestep()
     outside_temp_timeseries_x, outside_temp_timeseries_y = outside_temperature.get_timeseries(numpy=True)
     # SignalProcessing.fourier_transform(outside_temp_timeseries_y, outside_temp_timestep, plot=True)
-    # SignalProcessing.butter_lowpass_filter(data=outside_temp_timeseries_y, cutoff=0.0002, timestep=outside_temp_timestep, plot=True)
+    filtered_outdoor_temp = SignalProcessing.butter_lowpass_filter(data=outside_temp_timeseries_y, cutoff=0.0002, timestep=outside_temp_timestep)
+
+
+    #TODO: create a way to find a common start time. 
+    SignalProcessing.cross_correlation(filtered_indoor_temp, room_temperature_timestep, filtered_outdoor_temp, outside_temp_timestep, lags=9000, plot=True)
+    
+
 
     #TODO: radiator consumption data can't be filtered as above if you use the whole dataset since there are a lot of on/offs and it creates a lot of problems with overshooting.
     #TODO: solution could be to collect the 'on' states together then distribute them once the data is filtered. This may cause issues with the timestep. 
     radiator_consumption = Sensor(dbmanager=dbmanager, identifier="sensor.smart_plug_radiator_current_consumption")
     radiator_consumption_timestep = radiator_consumption.get_timestep()
     radiator_consumption_timeseries_x, radiator_consumption_timeseries_y = radiator_consumption.get_timeseries(numpy=True)
-    SignalProcessing.fourier_transform(radiator_consumption_timeseries_y, timestep=radiator_consumption_timestep, plot=True)
-    SignalProcessing.butter_lowpass_filter(data=radiator_consumption_timeseries_y, cutoff=0.02, timestep=radiator_consumption_timestep, plot=True)
+    # SignalProcessing.fourier_transform(radiator_consumption_timeseries_y, timestep=radiator_consumption_timestep, plot=True)
+    # SignalProcessing.butter_lowpass_filter(data=radiator_consumption_timeseries_y, cutoff=0.02, timestep=radiator_consumption_timestep, plot=True)
 
 
     #TODO: make timeseries from sensors and actuators align
@@ -128,12 +138,13 @@ async def main():
     #TODO: Investigate multi-rate system identificaiton
 
 
-    exit()
 
-    
-    test = SystemIdentification(radiator_input, radiator_output)
+
+    #TODO: determine how and when to use numpy vs pandas. SysID methods are made with pandas, and then convert to numpy. Similarly, other methods output numpy. 
+    test = SystemIdentification(filtered_indoor_temp, radiator_consumption_timeseries_y)
     test.fit_model_pysindy()
-
+    
+    exit()
 
 
 ### show plot
