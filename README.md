@@ -48,8 +48,9 @@ YAML_NAME = subscriptions.yaml
 
 # TODO:
 - Sensor class
+    - ~~Methods for cleaning data~~
+    - ~~Methods to output numpy and pandas~~
     - Create virtual sensors for testing
-    - 
 
 - Actuator Class
     - Send commands to HAOS via the websocket/api.
@@ -63,8 +64,9 @@ YAML_NAME = subscriptions.yaml
     - ~~Implement simple filtering techinques~~
     - Implement more filtering techniques
     - Functions for optimising filters
+    - Implement correlation functions
+    - Manage multi-rate timeseries
 
 - Real-time data
     - Use the websocket functionality of HAOS to allow the system to function live
-    - Making the sensor class be able to collect real-time data
-
+    - Making the sensor class be able to collect real-time data via the websocket
