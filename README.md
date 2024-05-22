@@ -8,6 +8,9 @@ The overall mission of this project is to implement advanced control techniques 
 ## Control Systems
 HAOS offers basic automations regarding turning switches on and off, or if the device supports it, tuning a specific variable (such as light intensity). These automations, although user friendly and fairly effective, have only the capabilities to implement condition-based control systems. To develop a true 'intelligent' home, the home needs to be able to automatically control actuators based on **goals** and **constraints** set by the user. The vision is to have the user input some relatively basic parameters (for example, keep temperature at 20°C) and some weighted optimisations (for example, minimise energy consumption (30%) and keep me comfortable (70%)). The controller then deals with _when_ to turn the heating on, and may use data such as energy price, current room temperature, external temperature etc. 
 
+The inspiration came from [this](https://uk.mathworks.com/help/mpc/ug/use-multistage-mpc-with-neural-state-space-prediction-model-for-house-heating.html) post, with the intention to create a real-life version of the controller. Similarly [this](https://www.sciencedirect.com/science/article/abs/pii/S0360544220303364) research has demonstrated the potential for energy and cost savings. 
+
+
 ##### Example MPC Diagram
 ![Example MPC Diagram](assets/MPC_bd.jpg)
 
