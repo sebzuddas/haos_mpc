@@ -109,7 +109,7 @@ class SignalProcessing:
             return f, Pxx_den
 
     @staticmethod
-    def auto_correlation(data:np.array, lags:int=10, plot:bool=False):
+    def auto_correlation(signal:object, lags:int=10, plot:bool=False):
         """
         The function `auto_correlation` calculates and optionally plots the autocorrelation of a given data
         array up to a specified number of lags.
@@ -129,6 +129,7 @@ class SignalProcessing:
         :return: The function `auto_correlation` is currently set to return a `NotImplementedError` when the
         `plot` parameter is set to `False`.
         """
+        data = signal.get_timseries(numpy=True)
         data = SignalProcessing.detrend(data)
         
         if plot:
@@ -147,65 +148,81 @@ class SignalProcessing:
             return NotImplementedError
 
     @staticmethod
-    def cross_correlation(data1: np.array, data1_timestep: float, data2: np.array, data2_timestep: float, lags: int = None, plot: bool = False):
-        # Ensure the input data arrays are non-empty
-        if len(data1) == 0 or len(data2) == 0:
-            raise ValueError("Input data arrays must be non-empty.")
+    def cross_correlation(signal1:object, signal2:object, lags_percentage: int = 75, plot: bool = False):
+        #inputs are sensor objects
 
-        # Create time vectors based on the provided timesteps
-        time_data1 = np.arange(0, len(data1) * data1_timestep, data1_timestep)
-        time_data2 = np.arange(0, len(data2) * data2_timestep, data2_timestep)
+        if lags_percentage>=100:
+            raise ValueError('Lags cannot be greater than 100%')
         
-        # Ensure time vectors cover the same range
-        common_start_time = max(time_data1[0], time_data2[0])
-        common_end_time = min(time_data1[-1], time_data2[-1])
+        signals = SignalProcessing.align_timeseries([signal1, signal2], numpy=True)# get a numpy array of the two signals
+        signals = signals[:, 1:]# get rid of the first column which is time
         
-        if common_start_time >= common_end_time:
-            raise ValueError("No overlapping time range between data1 and data2.")
-
-        # Create a common time vector with the smaller timestep for resampling
-        common_timestep = min(data1_timestep, data2_timestep)
-        common_time = np.arange(common_start_time, common_end_time, common_timestep)
-        
-
-        # Interpolate data1 and data2 to the common time vector
-        interpolator_data1 = interp1d(time_data1, data1, kind='linear', fill_value="extrapolate")
-        interpolator_data2 = interp1d(time_data2, data2, kind='linear', fill_value="extrapolate")
-
-        resampled_data1 = interpolator_data1(common_time)
-        resampled_data2 = interpolator_data2(common_time)
-
         # Dynamically determine the number of lags
-        if lags is None:
-            lags = min(len(resampled_data1), len(resampled_data2)) // 75  # Example: 10% of the shorter series
+        lags = int(signals.shape[0] * lags_percentage/100) # get the number of rows (samples) and find 75% of the lags
 
         if plot:
-            if len(resampled_data1) == 0 or len(resampled_data2) == 0:
-                raise ValueError("Resampled data arrays are empty.")
             plt.title("Cross-correlation Plot")
             plt.xlabel("Lags")
-            plt.xcorr(resampled_data1, resampled_data2, maxlags=lags, normed=True)
+            plt.xcorr(signals[:, 0], signals[:, 1], maxlags=lags, normed=True)
             plt.grid(True)
             plt.show()
         else:
-            if len(resampled_data1) == 0 or len(resampled_data2) == 0:
-                raise ValueError("Resampled data arrays are empty.")
             # Calculating cross-correlation
-            cross_corr = np.correlate(resampled_data1 - np.mean(resampled_data1), resampled_data2 - np.mean(resampled_data2), mode='full')
+            cross_corr = np.correlate(signals[:, 0] - np.mean(signals[:, 0]), signals[:, 1] - np.mean(signals[:, 1]), mode='full')
             # Normalizing the cross-correlation
-            cross_corr = cross_corr / (np.std(resampled_data1) * np.std(resampled_data2) * len(resampled_data1))
+            cross_corr = cross_corr / (np.std(signals[:, 0]) * np.std(signals[:, 1]) * len(signals[:, 1]))
             # Returning the central part of the cross-correlation
             mid = len(cross_corr) // 2
             return cross_corr[mid - lags: mid + lags + 1]
 
-
     @staticmethod
-    def align_timeseries(data:list):
+    def align_timeseries(data:list, earliest_time=None, numpy=False):
+        """
+        Expects a list of objects whose time series' need to be aligned and resampled
+        """
         #TODO: make a method that aligns a list of timeseries data that has different:
-        #TODO: starting and end points
+        #TODO: starting and end points - end points will be almost the same
         #TODO: sample rates
         #Is it better to have these as pandas dfs or a list of numpy arrays?
+
+        dataframes_list = [element.get_timeseries() for element in data] # now we get a list of python dataframes
+        timestep_list = [element.get_timestep() for element in data] # get the sampling time for all 
+        min_timestep = min(timestep_list) # get the smallest timestep to resample from
+        
+        sample_time = f'{min_timestep}S'
+
+        #find the most recent first entry within the time series
+        first_entries = [df.iloc[0] for df in dataframes_list]
+        most_recent_first_entry = max(first_entries, key=lambda x: x['time'])
+
+        last_entries = [df.iloc[-1] for df in dataframes_list]
+        final_entry = max(last_entries, key=lambda x: x['time'])
+
+        aligned_dataframes = [df[df.index >= most_recent_first_entry.name] for df in dataframes_list]# aligned to the start
+        trimmed_dataframes = [df[df.index <= final_entry.name] for df in aligned_dataframes]# cut off at the end
+
+        # Ensure the 'time' column is a datetime index
+        for i in range(len(trimmed_dataframes)):
+            trimmed_dataframes[i]['time'] = pd.to_datetime(trimmed_dataframes[i]['time'])
+            trimmed_dataframes[i].set_index('time', inplace=True)
+
+        resampled_dataframes = [df.resample(sample_time).interpolate() for df in trimmed_dataframes]# resampled with the same sampling frequency
+
+        combined_df = pd.concat(resampled_dataframes, axis=1, join='inner') # turn into one dataframe 
+
+        if numpy:
+            combined_df.reset_index(inplace=True)# make the time index a column that isn't an index
+            return combined_df.to_numpy()
+        
+        else:
+            return combined_df
+
+    @staticmethod
+    def stationarity():
+        #dickyfuller test, needed to check for for whether sysID methods are going to be successful. 
+        #TODO: implement a method to check for stationarity
         pass
+
 
     @staticmethod
     def moving_average(self, df) -> pd.DataFrame:
