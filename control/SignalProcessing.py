@@ -149,7 +149,31 @@ class SignalProcessing:
 
     @staticmethod
     def cross_correlation(signal1:object, signal2:object, lags_percentage: int = 75, plot: bool = False):
-        #inputs are sensor objects
+        """
+        The `cross_correlation` function calculates the cross-correlation between two signals, allowing for
+        a specified percentage of lags and an optional plot of the cross-correlation.
+        
+        :param signal1: Signal object representing the first signal data
+        :type signal1: object
+        :param signal2: Signal2 is the second input signal for which you want to calculate the
+        cross-correlation with signal1. This function `cross_correlation` takes two signals as input and
+        calculates the cross-correlation between them. The `signal2` parameter represents the second signal
+        object that you want to compare with `
+        :type signal2: object
+        :param lags_percentage: The `lags_percentage` parameter in the `cross_correlation` function
+        determines what percentage of lags to consider when calculating the cross-correlation between two
+        signals. By default, it is set to 75%, meaning that the function will use 75% of the lags available
+        in the signals for, defaults to 75
+        :type lags_percentage: int (optional)
+        :param plot: The `plot` parameter in the `cross_correlation` function is a boolean parameter that
+        determines whether a cross-correlation plot should be displayed or not. If `plot=True`, a
+        cross-correlation plot will be generated showing the correlation between the two input signals. If
+        `plot=False`, the function, defaults to False
+        :type plot: bool (optional)
+        :return: The function `cross_correlation` returns the central part of the cross-correlation between
+        two signals after calculating and normalizing the cross-correlation values. The returned value is a
+        numpy array representing the cross-correlation values within the specified lags range.
+        """
 
         if lags_percentage>=100:
             raise ValueError('Lags cannot be greater than 100%')
@@ -178,7 +202,27 @@ class SignalProcessing:
     @staticmethod
     def align_timeseries(data:list, earliest_time=None, numpy=False):
         """
-        Expects a list of objects whose time series' need to be aligned and resampled
+        The `align_timeseries` function aligns and resamples a list of time series data with different
+        starting and ending points and sample rates, returning either a combined pandas DataFrame or a numpy
+        array based on the specified parameters.
+        
+        :param data: The `align_timeseries` function you provided seems to align a list of time series data
+        with different starting and ending points and sample rates. It converts the data into pandas
+        DataFrames, aligns them based on the most recent first entry and the final entry, resamples them to
+        a common sampling frequency
+        :type data: list
+        :param earliest_time: The `earliest_time` parameter in the `align_timeseries` function is used to
+        specify a specific starting time for the aligned time series data. If provided, the function will
+        align the time series data starting from this specified time. If not provided (defaulting to
+        `None`), the function
+        :param numpy: The `numpy` parameter in the `align_timeseries` function determines whether the output
+        should be returned as a NumPy array (`numpy=True`) or as a pandas DataFrame (`numpy=False`). If
+        `numpy=True`, the function will convert the combined DataFrame into a NumPy array before returning
+        it, defaults to False (optional)
+        :return: The `align_timeseries` function returns either a combined pandas DataFrame or a numpy
+        array, depending on the value of the `numpy` parameter. If `numpy` is set to `True`, the function
+        returns the combined DataFrame converted to a numpy array. Otherwise, it returns the combined pandas
+        DataFrame.
         """
         #TODO: make a method that aligns a list of timeseries data that has different:
         #TODO: starting and end points - end points will be almost the same

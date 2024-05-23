@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+from control.SignalProcessing import SignalProcessing as dsp
+
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import normalize
 

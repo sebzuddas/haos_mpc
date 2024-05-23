@@ -4,6 +4,8 @@ A class to store data about specific sensors, and potentially create virtual sen
 import math
 import random
 import re
+import datetime
+
 
 import pandas as pd
 import numpy as np
@@ -31,7 +33,9 @@ class Sensor(Peripheral):
             self.initialise_attributes_from_df()
             self.x = np.array(self.timeseries.index)#should be date
             self.y = np.array(self.timeseries["state"])#should be value
-        # if the sensor is virtual
+        
+        else:
+            self.generate_virtual_data()
 
     ### Virtual Sensor Methods
     #TODO: Create Virtual Sensors
@@ -49,15 +53,42 @@ class Sensor(Peripheral):
         
         return NotImplemented
 
-    def generate_virtual_data(self):
-        """
-        if self.virtual:
-            #generate virtual data
-            print('generating virtual data')
+    def generate_virtual_data(self, sample_rate=None, amplitude=None, frequency=None, phase=None, noise_level=None, randomise:bool=False):
+        
+        if randomise:
+            sample_rate = sample_rate if sample_rate is not None else 60 + np.random.randint(-59, 6000)  # seconds with randomness
+            amplitude = amplitude if amplitude is not None else 1.0 + np.random.uniform(-0.1, 0.1)
+            frequency = frequency if frequency is not None else (1 / 86400) * (1 + np.random.uniform(-0.1, 0.1))  # daily frequency with 10% variation
+            phase = phase if phase is not None else np.random.uniform(-np.pi/4, np.pi/4)
+            noise_level = noise_level if noise_level is not None else 0.1 + np.random.uniform(-0.05, 0.05)
+        
         else:
-            print('generate forecasted data')
-        """
-        return NotImplemented
+            #params
+            sample_rate = sample_rate if sample_rate is not None else 60
+            amplitude = amplitude if amplitude is not None else 1
+            frequency = frequency if frequency is not None else 1 / 86400
+            phase = phase if phase is not None else 0
+            noise_level = noise_level if noise_level is not None else 0.1
+
+        # Calculate the number of samples
+        duration = 14  # 2 weeks
+        num_samples = int(duration * 24 * 60 * 60 / sample_rate)
+        
+        # Generate timestamps starting from two weeks from now
+        start_time = datetime.datetime.now() + datetime.timedelta(weeks=2)
+        timestamps = pd.date_range(start=start_time, periods=num_samples, freq=pd.DateOffset(seconds=sample_rate))
+        
+        # Generate the sinusoidal data
+        t = np.arange(num_samples) * sample_rate
+        sinusoidal_data = amplitude * np.sin(2 * np.pi * frequency * t + phase)
+        
+        # Add noise to the data
+        noise = noise_level * np.random.randn(num_samples)
+        data_with_noise = sinusoidal_data + noise
+        
+        # Create a DataFrame
+        self.df = pd.DataFrame({'Timestamp': timestamps, 'Value': data_with_noise})
+        
 
     ### Real Sensor
     def initialise_attributes_from_df(self):
@@ -89,6 +120,10 @@ class Sensor(Peripheral):
     def update_attributes(self, attributes):
             for key, value in attributes.items():
                 setattr(self, key, value)
+
+    def get_attributes(self):
+        # return the attributes gathered from the database
+        return NotImplementedError
     
     def get_timeseries(self, numpy=False):
         """
