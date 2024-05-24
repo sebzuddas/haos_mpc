@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 
 from control.SignalProcessing import SignalProcessing
+from peripherals.Sensor import Sensor
 
 # Unit Tests
 class TestSignalProcessing(unittest.TestCase):

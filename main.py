@@ -29,13 +29,6 @@ async def init_subscriptions(datamanager:object, subscriptions_file:str):
     pass
 
 
-async def get_database_data():
-    pass
-
-
-async def make_column_numeric(dataframe:object, colname:str = 'state'):
-    return pd.to_numeric(dataframe[colname])
-
 async def main():
 
     config = dotenv_values(".env")
@@ -93,6 +86,14 @@ async def main():
     # radiator_switch = Actuator(dbmanager=dbmanager, identifier="switch.smart_plug_radiator")
 
     room_temperature = Sensor(dbmanager=dbmanager, identifier="sensor.esphome_web_38fb3c_bme280_temperature")
+    test_sensor = Sensor(virtual=True)
+    test_sensor.generate_virtual_data(frequency=200, randomise=False)
+    test_sensor_2 = Sensor(virtual=True)
+    test_sensor_2.generate_virtual_data(frequency=200, randomise=False)
+    dsp.auto_correlation(test_sensor, plot=True)
+    dsp.cross_correlation(test_sensor, test_sensor_2, plot=True)
+
+    exit()
     # room_temperature_x, room_temperature_y = room_temperature.get_timeseries(numpy=True)
     # room_temperature_y_detrend = SignalProcessing.detrend(room_temperature_y)
     # room_temperature_timestep = room_temperature.get_timestep()

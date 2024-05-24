@@ -17,15 +17,17 @@ from peripherals.Peripheral import Peripheral
 
 
 class Sensor(Peripheral):
-    def __init__(self, dbmanager, identifier=None, virtual=False, **attributes):
+    def __init__(self, dbmanager=None, identifier=None, virtual=False, **attributes):
         
         self.virtual = virtual
         self.identifier = identifier
-        if not re.match(r'^sensor\.', identifier):
-            raise ValueError("Identifier does not indicate a sensor")
+        
         
         # If the sensor is real
         if identifier:
+            if not re.match(r'^sensor\.', identifier):
+                raise ValueError("Identifier does not indicate a sensor")
+        
             self.df = dbmanager.get_timeseries(identifier)
             self.timeseries = self.df.reset_index()[['time','state']]
             self.timeseries['state']=pd.to_numeric(self.timeseries["state"], errors='coerce').values
@@ -34,27 +36,35 @@ class Sensor(Peripheral):
             self.x = np.array(self.timeseries.index)#should be date
             self.y = np.array(self.timeseries["state"])#should be value
         
-        else:
-            self.generate_virtual_data()
+        elif virtual:
+            self.generate_virtual_data(randomise=True)
 
     ### Virtual Sensor Methods
     #TODO: Create Virtual Sensors
 
-    def initialize_empty_df(self):
-        """
-        now = datetime.now()
-        dates = pd.date_range(end=now, periods=14, freq='D')
-        self.timeseries = pd.DataFrame({
-            'state': [None] * 14,
-            'attributes': [{}] * 14,
-            'location': [None] * 14
-        }, index=dates)
-        """        
+    def initialise_virtual_df(self):
+        # Convert self.x to datetime
+        self.x = pd.to_datetime(self.x)
         
-        return NotImplemented
+        # Create a DataFrame with 'time' as the index
+        self.df = pd.DataFrame({
+            'state': self.y,
+            'time': self.x
+        })
+
+        # Perform same operations as with the real sensor
+        self.timeseries = self.df.reset_index()[['time', 'state']]
+        self.timeseries['state'] = pd.to_numeric(self.timeseries['state'], errors='coerce')
+        # Update self.x and self.y
+        self.x = np.array(self.timeseries.index)
+        self.y = np.array(self.timeseries['state'])
+
+
 
     def generate_virtual_data(self, sample_rate=None, amplitude=None, frequency=None, phase=None, noise_level=None, randomise:bool=False):
-        
+
+        random.seed(0)
+
         if randomise:
             sample_rate = sample_rate if sample_rate is not None else 60 + np.random.randint(-59, 6000)  # seconds with randomness
             amplitude = amplitude if amplitude is not None else 1.0 + np.random.uniform(-0.1, 0.1)
@@ -87,7 +97,9 @@ class Sensor(Peripheral):
         data_with_noise = sinusoidal_data + noise
         
         # Create a DataFrame
-        self.df = pd.DataFrame({'Timestamp': timestamps, 'Value': data_with_noise})
+        self.x = timestamps
+        self.y = data_with_noise
+        self.initialise_virtual_df()
         
 
     ### Real Sensor
@@ -112,6 +124,8 @@ class Sensor(Peripheral):
         return None        
 
     def get_timestep(self) -> float:
+        # Ensure the index is a datetime index
+        self.df.set_index('time', inplace=True)
         time_diffs = self.df.index.to_series().diff() # get the difference between sample times
         rounded_interval = time_diffs.mode()[0]# find most common time interval
         common_interval_seconds = round(rounded_interval.total_seconds()) # find the most common and round
@@ -139,10 +153,10 @@ class Sensor(Peripheral):
         handle the case when `numpy` is `True`.
         """
         if not numpy:
-            return self.timeseries
+            return self.timeseries #returns the dataframe
         
         else:
-            return self.x, self.y
+            return self.y# returns a 1d numpy array of the sensor values
 
     def get_state_at_time(self, time):
         pass
