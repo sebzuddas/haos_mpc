@@ -92,6 +92,8 @@ async def main():
     test_sensor_2.generate_virtual_data(frequency=200, randomise=False)
     dsp.auto_correlation(test_sensor, plot=True)
     dsp.cross_correlation(test_sensor, test_sensor_2, plot=True)
+    
+    print(dsp.stationarity(test_sensor))
 
     exit()
     # room_temperature_x, room_temperature_y = room_temperature.get_timeseries(numpy=True)

@@ -152,6 +152,7 @@ class Sensor(Peripheral):
         returned when `numpy` is `True`. It appears that there is a missing return statement or logic to
         handle the case when `numpy` is `True`.
         """
+        
         if not numpy:
             return self.timeseries #returns the dataframe
         

@@ -140,8 +140,7 @@ class SignalProcessing:
         :return: The function `auto_correlation` is currently set to return a `NotImplementedError` when the
         `plot` parameter is set to `False`.
         """
-        data = sensor1.get_timeseries(numpy=True)
-        data = SignalProcessing.detrend(data)
+        data = SignalProcessing.detrend(sensor1)
         
         if plot:
             # Adding plot title.
