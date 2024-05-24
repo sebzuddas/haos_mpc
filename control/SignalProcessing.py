@@ -1,5 +1,6 @@
 """
 The signal processing class contains a number of static methods primarily for signal analysis and filtering out noise. 
+This class is designed to work primarily with methods implemented within the Sensor class, such as get_timeseries() and get_timestep(). 
 """
 
 import pandas as pd
@@ -9,6 +10,9 @@ import pandas as pd
 from scipy import signal
 from scipy.signal import butter, lfilter, filtfilt, periodogram
 from scipy.interpolate import interp1d
+from statsmodels.tsa.stattools import adfuller
+
+
 
 import pywt
 
@@ -32,7 +36,7 @@ class SignalProcessing:
     #TODO: high pass
 
     @staticmethod
-    def butter_lowpass_filter(data:np.array,  cutoff, timestep:int=1, order:int=5, plot:bool=False):
+    def butter_lowpass_filter(sensor1:object,  cutoff, order:int=5, plot:bool=False):
         """
         The function `butter_lowpass_filter` applies a Butterworth lowpass filter to input data with
         specified cutoff frequency, timestep, order, and optional plotting capability.
@@ -62,7 +66,9 @@ class SignalProcessing:
         filtered data using matplotlib. If the `plot` parameter is set to `False`, the function will return
         the filtered data array `y`.
         """
-        data = SignalProcessing.detrend(data)
+    
+        data = SignalProcessing.detrend(sensor1)
+        timestep = sensor1.get_timestep()
         fs = 1/timestep #sample frequency
         b, a = SignalProcessing.__butter_lowpass(cutoff, fs, order=order)
         y = filtfilt(b, a, data) # to avoid lag you must flip the output and pass it through the filter again. filtfilt does this for you
@@ -76,7 +82,8 @@ class SignalProcessing:
             return y
     
     @staticmethod
-    def psd(data:np.array, timestep:int=1, plot:bool=False):
+    def psd(sensor1:object, plot:bool=False):
+        
         """
         The function `psd` calculates the power spectral density (PSD) of a given data array and optionally
         plots the PSD.
@@ -97,6 +104,10 @@ class SignalProcessing:
         Power Spectral Density (PSD) and will not return anything. If the `plot` parameter is set to
         `False`, the function will return the frequency array `f` and the PSD array `Pxx_den`.
         """
+
+        data = sensor1.get_timeseries(numpy=True)
+        timestep = sensor1.get_timestep()
+
         fs = 1/timestep #sample frequency
         f, Pxx_den = periodogram(x=data, fs=fs)
         
@@ -109,7 +120,7 @@ class SignalProcessing:
             return f, Pxx_den
 
     @staticmethod
-    def auto_correlation(signal:object, lags:int=10, plot:bool=False):
+    def auto_correlation(sensor1:object, lags:int=10, plot:bool=False):
         """
         The function `auto_correlation` calculates and optionally plots the autocorrelation of a given data
         array up to a specified number of lags.
@@ -129,7 +140,7 @@ class SignalProcessing:
         :return: The function `auto_correlation` is currently set to return a `NotImplementedError` when the
         `plot` parameter is set to `False`.
         """
-        data = signal.get_timeseries(numpy=True)
+        data = sensor1.get_timeseries(numpy=True)
         data = SignalProcessing.detrend(data)
         
         if plot:
@@ -148,18 +159,18 @@ class SignalProcessing:
             return NotImplementedError
 
     @staticmethod
-    def cross_correlation(signal1:object, signal2:object, lags_percentage: int = 75, plot: bool = False):
+    def cross_correlation(sensor1:object, sensor2:object, lags_percentage: int = 75, plot: bool = False):
         """
         The `cross_correlation` function calculates the cross-correlation between two signals, allowing for
         a specified percentage of lags and an optional plot of the cross-correlation.
         
-        :param signal1: Signal object representing the first signal data
-        :type signal1: object
-        :param signal2: Signal2 is the second input signal for which you want to calculate the
-        cross-correlation with signal1. This function `cross_correlation` takes two signals as input and
-        calculates the cross-correlation between them. The `signal2` parameter represents the second signal
+        :param sensor1: Signal object representing the first signal data
+        :type sensor1: object
+        :param sensor2: sensor2 is the second input signal for which you want to calculate the
+        cross-correlation with sensor1. This function `cross_correlation` takes two signals as input and
+        calculates the cross-correlation between them. The `sensor2` parameter represents the second signal
         object that you want to compare with `
-        :type signal2: object
+        :type sensor2: object
         :param lags_percentage: The `lags_percentage` parameter in the `cross_correlation` function
         determines what percentage of lags to consider when calculating the cross-correlation between two
         signals. By default, it is set to 75%, meaning that the function will use 75% of the lags available
@@ -176,9 +187,9 @@ class SignalProcessing:
         """
 
         if lags_percentage>=100:
-            raise ValueError('Lags cannot be greater than 100%')
+            raise ValueError('Lags cannot be greater than or equal to 100%')
         
-        signals = SignalProcessing.align_timeseries([signal1, signal2], numpy=True)# get a numpy array of the two signals
+        signals = SignalProcessing.align_timeseries([sensor1, sensor2], numpy=True)# get a numpy array of the two signals
         signals = signals[:, 1:]# get rid of the first column which is time
         
         # Dynamically determine the number of lags
@@ -224,10 +235,6 @@ class SignalProcessing:
         returns the combined DataFrame converted to a numpy array. Otherwise, it returns the combined pandas
         DataFrame.
         """
-        #TODO: make a method that aligns a list of timeseries data that has different:
-        #TODO: starting and end points - end points will be almost the same
-        #TODO: sample rates
-        #Is it better to have these as pandas dfs or a list of numpy arrays?
 
         dataframes_list = [element.get_timeseries() for element in data] # now we get a list of python dataframes
         timestep_list = [element.get_timestep() for element in data] # get the sampling time for all 
@@ -262,34 +269,57 @@ class SignalProcessing:
             return combined_df
 
     @staticmethod
-    def stationarity():
+    def stationarity(sensor1: object):
         #dickyfuller test, needed to check for for whether sysID methods are going to be successful. 
-        #TODO: implement a method to check for stationarity
-        pass
+        data = sensor1.get_timeseries(numpy=True)
+        result = adfuller(data)
+        return {
+            'Test Statistic': result[0],
+            'p-value': result[1],
+            'Lags Used': result[2],
+            'Number of Observations Used': result[3],
+            'Critical Values': result[4]
+        }
 
 
     @staticmethod
-    def moving_average(self, df) -> pd.DataFrame:
+    def moving_average(sensor1:object) -> pd.DataFrame:
         return NotImplementedError
 
     @staticmethod
-    def detrend(y, plot:bool = False):
+    def detrend(sensor1:object, plot:bool = False):
+        data = sensor1.get_timeseries(numpy=True)
+        
         if plot:
-            #TODO: implement plotting the detrend vs the standard signal
-            pass
+            detrended_data = SignalProcessing.detrend(sensor1)
+            plt.figure(figsize=(10, 6))
+
+            plt.subplot(2, 1, 1)
+            plt.plot(data, label='Original Signal')
+            plt.title('Original Signal')
+            plt.legend()
+            
+            plt.subplot(2, 1, 2)
+            plt.plot(detrended_data, label='Detrended Signal', color='orange')
+            plt.title('Detrended Signal')
+            plt.legend()
+
+            plt.tight_layout()
+            plt.show()
         else:
-            return signal.detrend(y)
+            return signal.detrend(data)
     
     @staticmethod
-    def fourier_transform(y, timestep: int = 1, plot: bool = False) -> pd.DataFrame:
-        # Detrend the data
-        y_detrend = SignalProcessing.detrend(y)
+    def fourier_transform(sensor1:object, plot: bool = False):
 
+        # Detrend the data
+        data_detrend = SignalProcessing.detrend(sensor1)
+        timestep = sensor1.get_timestep()
         # Perform FFT
-        FFT = np.fft.fft(y_detrend)
+        FFT = np.fft.fft(data_detrend)
 
         # Get frequency components
-        n = len(y_detrend)
+        n = len(data_detrend)
         freq = np.fft.fftfreq(n, d=timestep)
 
         # Normalize the FFT output

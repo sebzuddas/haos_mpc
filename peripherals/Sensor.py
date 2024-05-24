@@ -62,7 +62,7 @@ class Sensor(Peripheral):
 
 
     def generate_virtual_data(self, sample_rate=None, amplitude=None, frequency=None, phase=None, noise_level=None, randomise:bool=False):
-
+        # add capability for white noise
         random.seed(0)
 
         if randomise:

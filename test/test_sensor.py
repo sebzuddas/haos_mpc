@@ -34,15 +34,15 @@ class TestSensor(unittest.TestCase):
         np.random.seed(0)
         self.sample_signal = np.sin(np.linspace(0, 2 * np.pi, 100)) + 0.5 * np.random.randn(100)
     
-    def test_real(self):
-        pass
+    # def test_real(self):
+    #     pass
 
-    def test_virtual(self):
-        pass
+    # def test_virtual(self):
+    #     pass
 
-    def test_dataframe_real_virtual(self):
-        #compare the dataframes between real and virtual sensors
-        pass
+    # def test_dataframe_real_virtual(self):
+    #     #compare the dataframes between real and virtual sensors
+    #     pass
 
 if __name__ == '__main__':
     unittest.main()
