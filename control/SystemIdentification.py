@@ -19,11 +19,19 @@ import pysindy as ps
 
 
 class SystemIdentification:
-    def __init__(self, input_data:pd.DataFrame, output_data:pd.DataFrame, data_train_percentage=80) -> None:
+    def __init__(self, input_sensors:list, output_sensors:list, data_train_percentage=80) -> None:
         """
         A class to perform system identification. 
         Needs two separate dataframes passed in, separate input_datas and output_datas
         """
+
+        #TODO: need to take note of what is inputs and outputs, ie what variable is what
+        #TODO: need to normalise all data
+        #TODO: need to realign the inputs and outputs. 
+        #TODO: need to split into training and testing
+        #TODO: need to test whether its possible to do sysid from dsp (stationarity)
+        #TODO: analyse the residulas, which should resemble white noise.
+        #TODO: need to check the autocorrelation function of the residuals to ensure no significant correlation remains.
         
         # Convert input and output DataFrames to NumPy arrays
         self.input_data = input_data.values
@@ -49,11 +57,6 @@ class SystemIdentification:
             self.time_step = self.input_data.shape[0] # assign the number of rows to the time steps for the data if both inputs and outputs match
         except IndexError:
                 print(f'input_datas:{input_data.index} and output_datas :{output_data.index} have different amounts of datapoints.')
-
-        
-
-
-
 
     def fit_model(self):
 
@@ -98,7 +101,7 @@ class SystemIdentification:
         indicator_1 = np.ones_like(self.training_input_data) ## v2
         indicator_2 = np.ones_like(self.training_output_data)## v2
 
-        # Candidate Models...
+        # Candidate Models/basis functions
         # Instantiate the model using a polynomial library
         poly_order = 1  # Adjust based on your problem
         feature_library = ps.PolynomialLibrary(degree=poly_order, include_interaction=True)
@@ -112,7 +115,6 @@ class SystemIdentification:
 
         # Combine all features
         X = np.hstack([X_indicators, X_input[:, -1:], X_output[:, -1:]])## v2
-
 
         # # stack lagged data
         # X = np.column_stack([np.roll(self.training_input_data, i) for i in range(lag+1)] + 
