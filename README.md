@@ -1,9 +1,7 @@
 # NOTE: THIS IS A WORK IN PROGRESS!
 
-
-
 # Introduction
-The overall mission of this project is to implement advanced control techniques to make the *intelligent* home a reality that is accessible through Homeassistant. 
+The overall mission of this project is to implement advanced control techniques to make the *intelligent* home a reality that is accessible through Homeassistant. That is, a home that is able to gather data, turn it into information, establish a goal based on that information, and move towards it. 
 
 ## Control Systems
 HAOS offers basic automations regarding turning switches on and off, or if the device supports it, tuning a specific variable (such as light intensity). These automations, although user friendly and fairly effective, have only the capabilities to implement condition-based control systems (`if temperature <20 turn on heater` or `if temperature >22 turn off heater` and so on). This is prone to unintended consequences if set up incorrectly. Similarly, to account for many conditions, control logic implemented via `if` statements is tedious to set up. 
@@ -13,7 +11,7 @@ To develop a true 'intelligent' home, the home needs to be able to automatically
 The initial stages of this project will consider home heating systems since they are both expensive and carbon intensive. Similarly, most homes with traditional heating systems consider a house's radiators as a single output. However, the homeowner should be able to switch between choosing whether to heat the house or the people in the house, and potentially let the controller choose when to prioritise which.
 
 ### Model-predictive Control
-MPC is a technique for optimally controlling MIMO systems. Any building is inherently MIMO. 
+MPC is a technique for optimally controlling MIMO systems. 
 
 The inspiration came from [this](https://uk.mathworks.com/help/mpc/ug/use-multistage-mpc-with-neural-state-space-prediction-model-for-house-heating.html) post, with the intention to create a real-life version of the controller. Similarly [this](https://www.sciencedirect.com/science/article/abs/pii/S0360544220303364) research has demonstrated the potential for energy and cost savings. 
 
@@ -29,13 +27,12 @@ To realise this, there are three key components of the system that need to funct
 #### The PySINDy Library
 [PySINDy](https://pysindy.readthedocs.io/en/stable/) emphasises the use of _sparse_ regression, and seems the most appropriate System ID method to use so far. PySINDY also returns models in a state-space format, making it more appropriate for eventual integration within the rest of the control logic. 
 
+## Websockets
+### Live Data
+I saw the need to develop my own scripts that would enable me to access live HAOS sensor data in near-real-time. This prevents consistently querying the database to gather live sensor data, which in turn _could_ reduce the sampling rate to below Nyquist frequency depending on the sensor. The [websocket](https://developers.home-assistant.io/docs/api/websocket/#validate-config) API available shows the `.json` format for communicating with HAOS, but there didn't seem to be any wrapper available in Python. 
 
-
-
-
-## Accessing Live Sensor Data through Websockets
-In looking to develop my own custom automation systems that close the loop between sensors and actuators in HomeAssistant OS (HAOS), I saw the need to develop my own scripts that would enable me to access live HAOS sensor data in near-real-time. This prevents consistently querying the database to gather live sensor data, which in turn could reduce the sampling rate to below Nyquist frequency depending on the sensor. The [websocket](https://developers.home-assistant.io/docs/api/websocket/#validate-config) API available shows the `.json` format for communicating with HAOS, but there didn't seem to be anything for doing this using Python. 
-
+### Control Signals
+Control signals can be sent to HAOS via the websocket by [calling services](https://developers.home-assistant.io/docs/api/websocket/#calling-a-service).
 
 # Finishing Line
 This project will be finished when it:

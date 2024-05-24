@@ -1,3 +1,5 @@
+# this .yaml file is intended to set up the subscriptions that the websocket will use for a given setup. 
+
 events:
 
 
