@@ -27,6 +27,10 @@ To realise this, there are three key components of the system that need to funct
 #### The PySINDy Library
 [PySINDy](https://pysindy.readthedocs.io/en/stable/) emphasises the use of _sparse_ regression, and seems the most appropriate System ID method to use so far. PySINDY also returns models in a state-space format, making it more appropriate for eventual integration within the rest of the control logic. 
 
+#### The EKF-SINDy Paper
+
+The [EKF-SINDy](https://arxiv.org/abs/2404.07536) paper and the [corresponding code](https://github.com/ContiPaolo/EKF-SINDy) provide an approach for creating an [Extended Kalman Filter](https://en.wikipedia.org/wiki/Extended_Kalman_filter). 
+
 ## Websockets
 ### Live Data
 I saw the need to develop my own scripts that would enable me to access live HAOS sensor data in near-real-time. This prevents consistently querying the database to gather live sensor data, which in turn _could_ reduce the sampling rate to below Nyquist frequency depending on the sensor. The [websocket](https://developers.home-assistant.io/docs/api/websocket/#validate-config) API available shows the `.json` format for communicating with HAOS, but there didn't seem to be any wrapper available in Python. 
