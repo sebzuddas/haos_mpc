@@ -243,7 +243,7 @@ class SignalProcessing:
 
         #find the most recent first entry within the time series
         first_entries = [df.iloc[0] for df in dataframes_list]
-        most_recent_first_entry = max(first_entries, key=lambda x: x['time'])
+        most_recent_first_entry = max(first_entries, key=lambda x: x['time']) #TODO: might still be max or min not sure
 
         last_entries = [df.iloc[-1] for df in dataframes_list]
         final_entry = max(last_entries, key=lambda x: x['time'])
@@ -263,7 +263,6 @@ class SignalProcessing:
         if numpy:
             combined_df.reset_index(inplace=True)# make the time index a column that isn't an index
             return combined_df.to_numpy()
-        
         else:
             return combined_df
 

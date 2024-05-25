@@ -28,7 +28,7 @@ class Sensor(Peripheral):
             if not re.match(r'^sensor\.', identifier):
                 raise ValueError("Identifier does not indicate a sensor")
         
-            self.df = dbmanager.get_timeseries(identifier)
+            self.df = dbmanager.get_timeseries(identifier)# time is index on the real sensors already
             self.timeseries = self.df.reset_index()[['time','state']]
             self.timeseries['state']=pd.to_numeric(self.timeseries["state"], errors='coerce').values
             self.timeseries = self.timeseries.dropna()
@@ -71,7 +71,7 @@ class Sensor(Peripheral):
             frequency = frequency if frequency is not None else (1 / 86400) * (1 + np.random.uniform(-0.1, 0.1))  # daily frequency with 10% variation
             phase = phase if phase is not None else np.random.uniform(-np.pi/4, np.pi/4)
             noise_level = noise_level if noise_level is not None else 0.1 + np.random.uniform(-0.05, 0.05)
-        
+
         else:
             #params
             sample_rate = sample_rate if sample_rate is not None else 60
@@ -125,7 +125,11 @@ class Sensor(Peripheral):
 
     def get_timestep(self) -> float:
         # Ensure the index is a datetime index
-        self.df.set_index('time', inplace=True)
+        
+        if self.virtual:
+            self.df.set_index('time', inplace=True)
+            
+        
         time_diffs = self.df.index.to_series().diff() # get the difference between sample times
         rounded_interval = time_diffs.mode()[0]# find most common time interval
         common_interval_seconds = round(rounded_interval.total_seconds()) # find the most common and round

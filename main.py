@@ -85,17 +85,37 @@ async def main():
 
     # radiator_switch = Actuator(dbmanager=dbmanager, identifier="switch.smart_plug_radiator")
 
-    room_temperature = Sensor(dbmanager=dbmanager, identifier="sensor.esphome_web_38fb3c_bme280_temperature")
+    
     test_sensor = Sensor(virtual=True)
     test_sensor.generate_virtual_data(frequency=200, randomise=False)
     test_sensor_2 = Sensor(virtual=True)
     test_sensor_2.generate_virtual_data(frequency=200, randomise=False)
-    dsp.auto_correlation(test_sensor, plot=True)
-    dsp.cross_correlation(test_sensor, test_sensor_2, plot=True)
+
+    # dsp.auto_correlation(test_sensor, plot=True)
+    # dsp.cross_correlation(test_sensor, test_sensor_2, plot=True)
     
-    print(dsp.stationarity(test_sensor))
+    # print(dsp.stationarity(test_sensor))
+
+    test_model = SystemIdentification([test_sensor], [test_sensor_2])
+    test_model.fit_model_pysindy(basis_order_poly=4, sparsity=0.2)
+
+
+    # radiator_consumption = Sensor(dbmanager=dbmanager, identifier="sensor.smart_plug_radiator_current_consumption")# TODO: this data is problematic
+    # room_temperature = Sensor(dbmanager=dbmanager, identifier="sensor.esphome_web_38fb3c_bme280_temperature")
+    # outside_temperature = Sensor(dbmanager=dbmanager, identifier="sensor.home_realfeel_temperature")
+    # # radiator_switch = Actuator(dbmanager=dbmanager, identifier="switch.smart_plug_radiator")
+    
+    # test_model2 = SystemIdentification([room_temperature], [outside_temperature])
+
+    # test_model2.fit_model_pysindy(basis_order_poly=3, sparsity=0.01)
+
+
+
+
 
     exit()
+
+
     # room_temperature_x, room_temperature_y = room_temperature.get_timeseries(numpy=True)
     # room_temperature_y_detrend = SignalProcessing.detrend(room_temperature_y)
     # room_temperature_timestep = room_temperature.get_timestep()
