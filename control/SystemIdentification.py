@@ -137,4 +137,12 @@ class SystemIdentification:
         pass
 
     def get_model(self):
-        return self.model
+        #method to get the model itself in a numpy array
+        if not self.model:
+            return ValueError('Model not created, create the model first via:\n fit_model_pysindy()')
+        else:
+            return self.model.coefficients()
+    
+    def plot_train_test(self):
+        # method to plot the training and testing data as validation 
+        pass

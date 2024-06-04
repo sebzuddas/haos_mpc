@@ -93,25 +93,23 @@ async def main():
 
     # dsp.auto_correlation(test_sensor, plot=True)
     # dsp.cross_correlation(test_sensor, test_sensor_2, plot=True)
-    
     # print(dsp.stationarity(test_sensor))
 
-    test_model = SystemIdentification([test_sensor], [test_sensor_2])
-    test_model.fit_model_pysindy(basis_order_poly=4, sparsity=0.2)
+
+    # test_model = SystemIdentification([test_sensor], [test_sensor_2])
+    # test_model.fit_model_pysindy(basis_order_poly=4, sparsity=0.2)
+    # print(test_model.model.coefficients())
 
 
-    # radiator_consumption = Sensor(dbmanager=dbmanager, identifier="sensor.smart_plug_radiator_current_consumption")# TODO: this data is problematic
-    # room_temperature = Sensor(dbmanager=dbmanager, identifier="sensor.esphome_web_38fb3c_bme280_temperature")
-    # outside_temperature = Sensor(dbmanager=dbmanager, identifier="sensor.home_realfeel_temperature")
-    # # radiator_switch = Actuator(dbmanager=dbmanager, identifier="switch.smart_plug_radiator")
-    
-    # test_model2 = SystemIdentification([room_temperature], [outside_temperature])
-
-    # test_model2.fit_model_pysindy(basis_order_poly=3, sparsity=0.01)
+    radiator_consumption = Sensor(dbmanager=dbmanager, identifier="sensor.smart_plug_radiator_current_consumption")# TODO: this data is problematic
+    room_temperature = Sensor(dbmanager=dbmanager, identifier="sensor.esphome_web_38fb3c_bme280_temperature")
+    outside_temperature = Sensor(dbmanager=dbmanager, identifier="sensor.home_realfeel_temperature")
+    # radiator_switch = Actuator(dbmanager=dbmanager, identifier="switch.smart_plug_radiator")
 
 
-
-
+    test_model2 = SystemIdentification([room_temperature], [outside_temperature])
+    test_model2.fit_model_pysindy(basis_order_poly=3, sparsity=0.01)
+    print(test_model2.model.coefficients())
 
     exit()
 
