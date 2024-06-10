@@ -29,7 +29,7 @@ class SystemIdentification:
         #TODO: need to normalise all data - Done
         #TODO: need to realign the inputs and outputs - Done
         #TODO: need to split into training and testing - Done
-        #TODO: need to test whether its possible to do sysid from dsp (stationarity)
+        #TODO: need to validate sysid feasibility via dsp by finding the stationarity value (stationarity)
         #TODO: analyse the residulas, which should resemble white noise.
         #TODO: need to check the autocorrelation function of the residuals to ensure no significant correlation remains.
 
@@ -93,15 +93,21 @@ class SystemIdentification:
     #     print(self.results)
 
 
-    def fit_model_pysindy(self, basis_order_poly: int = 4, sparsity = 0.5):
+    def fit_model_pysindy(self, lag_value:int = 0,  basis_order_poly: int = 4, basis_frequencies:int = 0, sparsity = 0.5):
             # Create basis functions
             poly_order = basis_order_poly  # Adjust based on your problem
+            lag = lag_value
+            feature_lib_list = []# this cannot be empty
+            
+            if basis_order_poly!=0:
+                polynomial_library = ps.PolynomialLibrary(degree=poly_order, include_interaction=True)
+                feature_lib_list.append(polynomial_library)
 
-            polynomial_library = ps.PolynomialLibrary(degree=poly_order, include_interaction=True)
-            fourier_library = ps.FourierLibrary(n_frequencies=5)  # Example Fourier library
+            if basis_frequencies!=0:
+                fourier_library = ps.FourierLibrary(n_frequencies=basis_frequencies)  # Example Fourier library
+                feature_lib_list.append(fourier_library)
 
-            feature_library = ps.GeneralizedLibrary([polynomial_library, fourier_library])
-            lag = 1
+            feature_library = ps.GeneralizedLibrary(feature_lib_list)
 
             # Prepare lagged data using combined aligned_data
             X = np.column_stack([np.roll(self.train_data, i, axis=0) for i in range(lag + 1)])

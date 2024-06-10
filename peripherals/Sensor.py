@@ -167,7 +167,8 @@ class Sensor(Peripheral):
         pass
 
     def plot(self):
-        pass
+        self.timeseries.plot('time', 'state')
+
 
     #TODO: does this need to be an async function because it will need to be able to handle the websocket data?
     def update_series(self, time, state, location=None):

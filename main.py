@@ -108,7 +108,9 @@ async def main():
 
 
     test_model2 = SystemIdentification([room_temperature], [outside_temperature])
-    test_model2.fit_model_pysindy(basis_order_poly=3, sparsity=0.01)
+
+    #how to determine the amount of lag?
+    test_model2.fit_model_pysindy(lag_value=2, basis_order_poly=2, basis_frequencies=0,  sparsity=0.001)
     print(test_model2.model.coefficients())
 
     exit()

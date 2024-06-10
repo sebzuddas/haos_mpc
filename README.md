@@ -65,7 +65,9 @@ YAML_NAME = subscriptions.yaml
     - ~~Methods to output numpy and pandas~~
     - Create virtual sensors for testing
         - Ensure the dataframes for `df` and `timeseries` are exactly the same
-    - Unit test to ensure that the timestep of a virtual sensor is the same as what is returned by the get_timestep() method
+        - Unit test to ensure that the timestep of a virtual sensor is the same as what is returned by the get_timestep() method
+    - ~~Plotting capabilities~~
+    
 
 - Actuator Class
     - Send commands to HAOS via the websocket/api.
