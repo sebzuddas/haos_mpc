@@ -54,7 +54,6 @@ class SystemIdentification:
         # print(self.aligned_data)
         # print(self.train_data, self.test_data)
 
-
     # def fit_model(self):
 
     #     basis_function = Polynomial(degree=2)
@@ -91,7 +90,6 @@ class SystemIdentification:
     #         )
         
     #     print(self.results)
-
 
     def fit_model_pysindy(self, lag_value:int = 0,  basis_order_poly: int = 4, basis_frequencies:int = 0, sparsity = 0.5):
             # Create basis functions

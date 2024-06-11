@@ -238,7 +238,7 @@ class SignalProcessing:
         dataframes_list = [element.get_timeseries() for element in data] # now we get a list of python dataframes
         timestep_list = [element.get_timestep() for element in data] # get the sampling time for all 
         min_timestep = min(timestep_list) # get the smallest timestep to resample from
-        
+
         sample_time = f'{min_timestep}S'
 
         #find the most recent first entry within the time series
@@ -268,7 +268,7 @@ class SignalProcessing:
 
     @staticmethod
     def stationarity(sensor1: object):
-        #dickyfuller test, needed to check for for whether sysID methods are going to be successful. 
+        #dickyfuller test, needed to check for for whether sysID methods are going to be successful.
         data = sensor1.get_timeseries(numpy=True)
         result = adfuller(data)
         return {
